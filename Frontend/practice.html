@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeBattle - Hiring Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4a69bd;
+            --primary-dark: #3c55a5;
+            --primary-light: #5f7de8;
+            --secondary: #6a89cc;
+            --text-primary: #f5f6fa;
+            --text-secondary: #dcdde1;
+            --bg-dark: #2f3640;
+            --bg-light: #353b48;
+            --bg-lighter: #3d4452;
+            --success: #4cd137;
+            --warning: #fbc531;
+            --danger: #e84118;
+            --border-radius: 6px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--bg-light);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .brand { 
+            font-size: 1.5rem; 
+            font-weight: bold; 
+            color: var(--primary); 
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .brand i {
+            font-size: 1.8rem;
+        }
+        
+        .nav-links { 
+            display: flex; 
+            gap: 1.5rem; 
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover { 
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-links a.active { 
+            color: var(--primary); 
+            font-weight: 600; 
+            background-color: rgba(74, 105, 189, 0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .tab-container {
+            display: flex;
+            background-color: var(--bg-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tab:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            background-color: rgba(74, 105, 189, 0.1);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active { display: block; }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: var(--border-radius);
+            border: none;
+            background-color: var(--bg-lighter);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        
+        .candidate-card {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--box-shadow);
+            border-left: 4px solid transparent;
+        }
+        
+        .candidate-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            border-left-color: var(--primary);
+        }
+        
+        .candidate-info {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+        
+        .candidate-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .candidate-details h3 {
+            margin-bottom: 0.25rem;
+            font-size: 1.2rem;
+        }
+        
+        .candidate-details p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .candidate-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .score-badge {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .candidate-status {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .status-new { background-color: var(--secondary); }
+        .status-reviewed { background-color: var(--warning); }
+        .status-interviewed { background-color: var(--success); }
+        .status-rejected { background-color: var(--danger); }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #45c130;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-primary);
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-lighter);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(74, 105, 189, 0.3);
+        }
+        
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23dcdde1' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 16px 12px;
+        }
+        
+        .checkbox-container {
+            background-color: var(--bg-lighter);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+        
+        .checkbox-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 0.75rem;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checkbox-item label {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            border-top: 4px solid var(--primary);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-light);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+        
+        .toast-message {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">
+            <i class="fas fa-code"></i>
+            <span>CodeBattle</span>
+        </div>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="battle.html">Battles</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="practice.html" class="active">Hiring Platform</a>
+            <a href="user.html">Profile</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="tab-container">
+            <div class="tab active" onclick="openTab('candidate-pool')">
+                <i class="fas fa-users"></i> Candidate Pool
+            </div>
+            <div class="tab" onclick="openTab('create-assessment')">
+                <i class="fas fa-clipboard-check"></i> Create Assessment
+            </div>
+            <div class="tab" onclick="openTab('reports')">
+                <i class="fas fa-chart-bar"></i> Reports
+            </div>
+        </div>
+        
+        <div id="candidate-pool" class="tab-content active">
+            <div class="section-header">
+                <h2>Candidate Pool</h2>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search candidates...">
+                    </div>
+                    <button class="btn btn-primary" id="addCandidateBtn" onclick="openModal('addCandidateModal')">
+                        <i class="fas fa-plus"></i> Add Candidate
+                    </button>
+                </div>
+            </div>
+            
+            <div class="candidate-list">
+                <div class="candidate-card">
+                    <div class="candidate-info">
+                        <div class="candidate-avatar">JD</div>
+                        <div class="candidate-details">
+                            <h3>John Doe</h3>
+                            <p>Frontend Developer • Applied 2 days ago</p>
+                        </div>
+                    </div>
+                    <div class="candidate-meta">
+                        <div class="score-badge">92%</div>
+                        <span class="candidate-status status-reviewed">Reviewed</span>
+                        <button class="btn btn-primary">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="candidate-card">
+                    <div class="candidate-info">
+                        <div class="candidate-avatar">AS</div>
+                        <div class="candidate-details">
+                            <h3>Alice Smith</h3>
+                            <p>Full Stack Developer • Applied 3 days ago</p>
+                        </div>
+                    </div>
+                    <div class="candidate-meta">
+                        <div class="score-badge">88%</div>
+                        <span class="candidate-status status-interviewed">Interviewed</span>
+                        <button class="btn btn-primary">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="candidate-card">
+                    <div class="candidate-info">
+                        <div class="candidate-avatar">RJ</div>
+                        <div class="candidate-details">
+                            <h3>Robert Johnson</h3>
+                            <p>Backend Developer • Applied 1 day ago</p>
+                        </div>
+                    </div>
+                    <div class="candidate-meta">
+                        <div class="score-badge">78%</div>
+                        <span class="candidate-status status-new">New</span>
+                        <button class="btn btn-primary">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="candidate-card">
+                    <div class="candidate-info">
+                        <div class="candidate-avatar">EW</div>
+                        <div class="candidate-details">
+                            <h3>Emma Wilson</h3>
+                            <p>DevOps Engineer • Applied 5 days ago</p>
+                        </div>
+                    </div>
+                    <div class="candidate-meta">
+                        <div class="score-badge">65%</div>
+                        <span class="candidate-status status-rejected">Rejected</span>
+                        <button class="btn btn-primary">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="candidate-card">
+                    <div class="candidate-info">
+                        <div class="candidate-avatar">MB</div>
+                        <div class="candidate-details">
+                            <h3>Michael Brown</h3>
+                            <p>Mobile Developer • Applied 4 days ago</p>
+                        </div>
+                    </div>
+                    <div class="candidate-meta">
+                        <div class="score-badge">85%</div>
+                        <span class="candidate-status status-reviewed">Reviewed</span>
+                        <button class="btn btn-primary">View Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="create-assessment" class="tab-content">
+            <h2 style="margin-bottom: 1.5rem;">Create Assessment</h2>
+            
+            <form style="max-width: 800px;">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Assessment Title</label>
+                    <input type="text" placeholder="e.g., Frontend Developer Technical Assessment" style="width: 100%; padding: 0.75rem; background-color: var(--bg-dark); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--border-radius);">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Job Position</label>
+                    <select style="width: 100%; padding: 0.75rem; background-color: var(--bg-dark); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--border-radius);">
+                        <option value="">Select a position</option>
+                        <option value="frontend">Frontend Developer</option>
+                        <option value="backend">Backend Developer</option>
+                        <option value="fullstack">Full Stack Developer</option>
+                        <option value="mobile">Mobile Developer</option>
+                        <option value="devops">DevOps Engineer</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Time Limit (minutes)</label>
+                    <input type="number" min="15" max="180" value="60" style="width: 100%; padding: 0.75rem; background-color: var(--bg-dark); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--border-radius);">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Select Problems</label>
+                    <div style="background-color: var(--bg-dark); border-radius: var(--border-radius); padding: 1rem; max-height: 300px; overflow-y: auto;">
+                        <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                            <input type="checkbox" id="problem1" style="margin-right: 0.5rem;">
+                            <label for="problem1">Two Sum (Easy)</label>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                            <input type="checkbox" id="problem2" style="margin-right: 0.5rem;">
+                            <label for="problem2">Reverse String (Easy)</label>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                            <input type="checkbox" id="problem3" style="margin-right: 0.5rem;">
+                            <label for="problem3">Palindrome Number (Easy)</label>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                            <input type="checkbox" id="problem4" style="margin-right: 0.5rem;">
+                            <label for="problem4">Valid Parentheses (Easy)</label>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                            <input type="checkbox" id="problem5" style="margin-right: 0.5rem;">
+                            <label for="problem5">Merge Sorted Arrays (Medium)</label>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                            <input type="checkbox" id="problem6" style="margin-right: 0.5rem;">
+                            <label for="problem6">Binary Search (Medium)</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Instructions</label>
+                    <textarea placeholder="Enter instructions for candidates..." style="width: 100%; padding: 0.75rem; background-color: var(--bg-dark); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--border-radius); min-height: 100px;"></textarea>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                    <button type="button" class="btn" style="background-color: var(--bg-dark);">Cancel</button>
+                    <button type="button" class="btn btn-success">Create Assessment</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="reports" class="tab-content">
+            <h2 style="margin-bottom: 1.5rem;">Assessment Reports</h2>
+            
+            <div style="display: flex; gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="background-color: var(--bg-light); border-radius: var(--border-radius); padding: 1.5rem; flex: 1; text-align: center;">
+                    <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">24</h3>
+                    <p>Active Assessments</p>
+                </div>
+                <div style="background-color: var(--bg-light); border-radius: var(--border-radius); padding: 1.5rem; flex: 1; text-align: center;">
+                    <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">18</h3>
+                    <p>Completed Assessments</p>
+                </div>
+                <div style="background-color: var(--bg-light); border-radius: var(--border-radius); padding: 1.5rem; flex: 1; text-align: center;">
+                    <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">10</h3>
+                    <p>Interviews Scheduled</p>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            function openTab(tabName) {
+                const tabContents = document.getElementsByClassName("tab-content");
+                for (let i = 0; i < tabContents.length; i++) {
+                    tabContents[i].classList.remove("active");
+                }
+                
+                const tabs = document.getElementsByClassName("tab");
+                for (let i = 0; i < tabs.length; i++) {
+                    tabs[i].classList.remove("active");
+                }
+                
+                document.getElementById(tabName).classList.add("active");
+                event.currentTarget.classList.add("active");
+            }
+        </script>
+    </div>
+</body>
+</html>
+
+
+
+
+
