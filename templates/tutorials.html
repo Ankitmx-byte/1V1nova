@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+
+{% block title %}CodeBattle - Tutorials{% endblock %}
+
+{% block styles %}
+<style>
+    .tutorials-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+    
+    .page-header p {
+        color: var(--text-secondary);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .tutorials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .tutorial-card {
+        background-color: var(--bg-light);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+    }
+    
+    .tutorial-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .tutorial-image {
+        height: 180px;
+        background-color: var(--bg-lighter);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 3rem;
+    }
+    
+    .tutorial-content {
+        padding: 1.5rem;
+    }
+    
+    .tutorial-title {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+    }
+    
+    .tutorial-description {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    .tutorial-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .tutorial-level {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    
+    .tutorial-duration {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    
+    .tutorial-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--box-shadow);
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid var(--text-secondary);
+        color: var(--text-primary);
+    }
+    
+    .btn-outline:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    
+    .categories {
+        margin-bottom: 3rem;
+    }
+    
+    .categories-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+    }
+    
+    .categories-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .category-item {
+        background-color: var(--bg-light);
+        padding: 0.75rem 1.5rem;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .category-item:hover, .category-item.active {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .tutorials-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tutorials-container">
+    <div class="page-header">
+        <h1>Coding Tutorials</h1>
+        <p>Learn programming concepts, algorithms, and best practices with our comprehensive tutorials.</p>
+    </div>
+    
+    <div class="categories">
+        <h2 class="categories-title">Categories</h2>
+        <div class="categories-list">
+            <div class="category-item active">All</div>
+            <div class="category-item">Algorithms</div>
+            <div class="category-item">Data Structures</div>
+            <div class="category-item">Web Development</div>
+            <div class="category-item">Mobile Development</div>
+            <div class="category-item">Machine Learning</div>
+            <div class="category-item">System Design</div>
+        </div>
+    </div>
+    
+    <div class="tutorials-grid">
+        <!-- Tutorial 1 -->
+        <div class="tutorial-card">
+            <div class="tutorial-image">
+                <i class="fas fa-code"></i>
+            </div>
+            <div class="tutorial-content">
+                <h3 class="tutorial-title">Introduction to Algorithms</h3>
+                <p class="tutorial-description">Learn the fundamentals of algorithms and how they work. This tutorial covers basic concepts, time complexity, and space complexity.</p>
+                <div class="tutorial-meta">
+                    <div class="tutorial-level">
+                        <i class="fas fa-signal"></i>
+                        <span>Beginner</span>
+                    </div>
+                    <div class="tutorial-duration">
+                        <i class="fas fa-clock"></i>
+                        <span>30 min</span>
+                    </div>
+                </div>
+                <div class="tutorial-actions">
+                    <a href="#" class="btn btn-outline">Preview</a>
+                    <a href="#" class="btn btn-primary">Start Learning</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tutorial 2 -->
+        <div class="tutorial-card">
+            <div class="tutorial-image">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <div class="tutorial-content">
+                <h3 class="tutorial-title">Data Structures Explained</h3>
+                <p class="tutorial-description">Explore common data structures like arrays, linked lists, stacks, queues, trees, and graphs. Learn when to use each one.</p>
+                <div class="tutorial-meta">
+                    <div class="tutorial-level">
+                        <i class="fas fa-signal"></i>
+                        <span>Intermediate</span>
+                    </div>
+                    <div class="tutorial-duration">
+                        <i class="fas fa-clock"></i>
+                        <span>45 min</span>
+                    </div>
+                </div>
+                <div class="tutorial-actions">
+                    <a href="#" class="btn btn-outline">Preview</a>
+                    <a href="#" class="btn btn-primary">Start Learning</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tutorial 3 -->
+        <div class="tutorial-card">
+            <div class="tutorial-image">
+                <i class="fas fa-sort-amount-down"></i>
+            </div>
+            <div class="tutorial-content">
+                <h3 class="tutorial-title">Sorting Algorithms</h3>
+                <p class="tutorial-description">Master different sorting algorithms including bubble sort, insertion sort, merge sort, quick sort, and heap sort.</p>
+                <div class="tutorial-meta">
+                    <div class="tutorial-level">
+                        <i class="fas fa-signal"></i>
+                        <span>Intermediate</span>
+                    </div>
+                    <div class="tutorial-duration">
+                        <i class="fas fa-clock"></i>
+                        <span>60 min</span>
+                    </div>
+                </div>
+                <div class="tutorial-actions">
+                    <a href="#" class="btn btn-outline">Preview</a>
+                    <a href="#" class="btn btn-primary">Start Learning</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tutorial 4 -->
+        <div class="tutorial-card">
+            <div class="tutorial-image">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="tutorial-content">
+                <h3 class="tutorial-title">Search Algorithms</h3>
+                <p class="tutorial-description">Learn different search algorithms including linear search, binary search, depth-first search, and breadth-first search.</p>
+                <div class="tutorial-meta">
+                    <div class="tutorial-level">
+                        <i class="fas fa-signal"></i>
+                        <span>Intermediate</span>
+                    </div>
+                    <div class="tutorial-duration">
+                        <i class="fas fa-clock"></i>
+                        <span>40 min</span>
+                    </div>
+                </div>
+                <div class="tutorial-actions">
+                    <a href="#" class="btn btn-outline">Preview</a>
+                    <a href="#" class="btn btn-primary">Start Learning</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tutorial 5 -->
+        <div class="tutorial-card">
+            <div class="tutorial-image">
+                <i class="fas fa-laptop-code"></i>
+            </div>
+            <div class="tutorial-content">
+                <h3 class="tutorial-title">Dynamic Programming</h3>
+                <p class="tutorial-description">Master the art of dynamic programming to solve complex problems by breaking them down into simpler subproblems.</p>
+                <div class="tutorial-meta">
+                    <div class="tutorial-level">
+                        <i class="fas fa-signal"></i>
+                        <span>Advanced</span>
+                    </div>
+                    <div class="tutorial-duration">
+                        <i class="fas fa-clock"></i>
+                        <span>90 min</span>
+                    </div>
+                </div>
+                <div class="tutorial-actions">
+                    <a href="#" class="btn btn-outline">Preview</a>
+                    <a href="#" class="btn btn-primary">Start Learning</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tutorial 6 -->
+        <div class="tutorial-card">
+            <div class="tutorial-image">
+                <i class="fas fa-sitemap"></i>
+            </div>
+            <div class="tutorial-content">
+                <h3 class="tutorial-title">Graph Algorithms</h3>
+                <p class="tutorial-description">Explore graph algorithms including shortest path algorithms, minimum spanning trees, and network flow algorithms.</p>
+                <div class="tutorial-meta">
+                    <div class="tutorial-level">
+                        <i class="fas fa-signal"></i>
+                        <span>Advanced</span>
+                    </div>
+                    <div class="tutorial-duration">
+                        <i class="fas fa-clock"></i>
+                        <span>75 min</span>
+                    </div>
+                </div>
+                <div class="tutorial-actions">
+                    <a href="#" class="btn btn-outline">Preview</a>
+                    <a href="#" class="btn btn-primary">Start Learning</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

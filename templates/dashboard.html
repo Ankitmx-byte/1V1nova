@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+
+{% block title %}CodeBattle - Dashboard{% endblock %}
+
+{% block styles %}
+<style>
+    :root {
+        --primary: #4a69bd;
+        --primary-dark: #3c55a5;
+        --primary-light: #5f7de8;
+        --secondary: #6a89cc;
+        --text-primary: #f5f6fa;
+        --text-secondary: #dcdde1;
+        --bg-dark: #2f3640;
+        --bg-light: #353b48;
+        --bg-lighter: #3d4452;
+        --success: #4cd137;
+        --warning: #fbc531;
+        --danger: #e84118;
+        --border-radius: 6px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-primary);
+        line-height: 1.6;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .hero {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .hero h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary);
+    }
+    
+    .hero p {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        max-width: 800px;
+        margin: 0 auto 2rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--box-shadow);
+        text-decoration: none;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .feature-card {
+        background-color: var(--bg-light);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        text-align: center;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+    
+    .feature-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-card p {
+        color: var(--text-secondary);
+    }
+    
+    /* Challenges Section Styles */
+    .challenges-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .challenges-section h2 {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary);
+    }
+    
+    .challenges-section > p {
+        text-align: center;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+    
+    .challenges-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .challenge-card {
+        background-color: var(--bg-light);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        cursor: pointer;
+        border-left: 4px solid transparent;
+    }
+    
+    .challenge-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        border-left-color: var(--primary);
+    }
+    
+    .challenge-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .challenge-header h3 {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+    
+    .difficulty {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+    
+    .difficulty.easy {
+        background-color: var(--success);
+    }
+    
+    .difficulty.medium {
+        background-color: var(--warning);
+    }
+    
+    .difficulty.hard {
+        background-color: var(--danger);
+    }
+    
+    .challenge-description {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        min-height: 60px;
+    }
+    
+    .challenge-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .points {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    
+    .points i {
+        color: var(--warning);
+    }
+    
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .view-all-challenges {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid var(--text-secondary);
+        color: var(--text-primary);
+    }
+    
+    .btn-outline:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .challenges-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Welcome to CodeBattle</h1>
+    <p>Improve your coding skills by competing with others in real-time coding battles. Practice, learn, and climb the leaderboard!</p>
+    <a href="{{ url_for('battle') }}" class="btn btn-primary">
+        <i class="fas fa-code"></i> Start Coding
+    </a>
+</div>
+
+<div class="features">
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-laptop-code"></i>
+        </div>
+        <h3>Real-time Battles</h3>
+        <p>Compete with other coders in real-time coding challenges and see who can solve problems faster.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <h3>Leaderboard</h3>
+        <p>Climb the ranks and show off your coding skills on our global leaderboard.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-briefcase"></i>
+        </div>
+        <h3>Hiring Platform</h3>
+        <p>Get noticed by top companies looking for talented developers through our hiring platform.</p>
+    </div>
+</div>
+
+<div class="challenges-section">
+    <h2>Coding Challenges</h2>
+    <p>Solve these coding challenges to earn points and improve your skills</p>
+    
+    <div class="challenges-grid">
+        {% for challenge in challenges %}
+        <div class="challenge-card" onclick="window.location.href='{{ url_for('challenges') }}'">
+            <div class="challenge-header">
+                <h3>{{ challenge.title }}</h3>
+                <span class="difficulty {{ challenge.difficulty.lower() }}">{{ challenge.difficulty }}</span>
+            </div>
+            <p class="challenge-description">{{ challenge.description|truncate(100) }}</p>
+            <div class="challenge-footer">
+                <div class="points">
+                    <i class="fas fa-star"></i>
+                    <span>{{ challenge.points }} points</span>
+                </div>
+                <button class="btn btn-primary btn-sm">Solve</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="view-all-challenges">
+        <a href="{{ url_for('challenges') }}" class="btn btn-outline">
+            <i class="fas fa-list"></i> View All Challenges
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Make challenges data available to any JavaScript
+    window.challenges = {{ challenges|tojson }};
+</script>
+{% endblock %}

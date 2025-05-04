@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}CodeBattle - Challenges{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/challenges.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="challenges-container">
+    <div class="challenges-list">
+        <h2>Coding Challenges</h2>
+
+        <div class="filter-controls">
+            <div class="filter-group">
+                <label for="difficulty-filter">Difficulty:</label>
+                <select id="difficulty-filter" onchange="filterChallenges()">
+                    <option value="all">All</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="category-filter">Category:</label>
+                <select id="category-filter" onchange="filterChallenges()">
+                    <option value="all">All</option>
+                    {% set categories = [] %}
+                    {% for challenge in challenges %}
+                        {% if challenge.category not in categories %}
+                            {% set _ = categories.append(challenge.category) %}
+                            <option value="{{ challenge.category }}">{{ challenge.category }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button id="reset-filters" onclick="resetFilters()" class="btn-reset">
+                <i class="fas fa-sync-alt"></i> Reset
+            </button>
+        </div>
+
+        <div class="challenges-count">
+            <span id="challenges-count">Showing {{ challenges|length }} challenges</span>
+        </div>
+
+        {% for challenge in challenges %}
+        <div class="challenge-item"
+             data-id="{{ challenge.id }}"
+             data-difficulty="{{ challenge.difficulty.lower() }}"
+             data-category="{{ challenge.category }}"
+             onclick="selectChallenge({{ challenge.id }})">
+            <h3>
+                {{ challenge.title }}
+                <span class="difficulty {{ challenge.difficulty.lower() }}">{{ challenge.difficulty }}</span>
+            </h3>
+            <p>{{ challenge.description|truncate(80) }}</p>
+            <div class="challenge-meta">
+                <div class="category">
+                    <i class="fas fa-folder"></i>
+                    <span>{{ challenge.category }}</span>
+                </div>
+                <div class="points">
+                    <i class="fas fa-star"></i>
+                    <span>{{ challenge.points }} points</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="challenge-content">
+        <div id="challenge-placeholder">
+            <i class="fas fa-code"></i>
+            <h2>Select a Challenge</h2>
+            <p>Choose a coding challenge from the list to start solving and earn rewards.</p>
+        </div>
+
+        <div id="challenge-details" style="display: none;">
+            <div class="challenge-details">
+                <h2>
+                    <span id="challenge-title"></span>
+                    <span id="challenge-difficulty" class="difficulty"></span>
+                </h2>
+                <div class="challenge-meta-info">
+                    <div class="category">
+                        <i class="fas fa-folder"></i>
+                        <span id="challenge-category"></span>
+                    </div>
+                    <div class="points">
+                        <i class="fas fa-star"></i>
+                        <span id="challenge-points"></span> points
+                    </div>
+                </div>
+                <div class="challenge-description" id="challenge-description"></div>
+
+                <div class="test-cases">
+                    <h3>Test Cases</h3>
+                    <div id="test-cases-container"></div>
+                </div>
+            </div>
+
+            <div class="code-editor">
+                <div class="editor-header">
+                    <h3>Code Editor</h3>
+                    <select id="language-select" class="language-select" onchange="changeLanguage()">
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++</option>
+                    </select>
+                </div>
+                <div class="editor-container">
+                    <div id="editor"></div>
+                </div>
+                <div class="editor-actions">
+                    <button class="btn btn-outline" onclick="resetCode()">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                    <button class="btn btn-primary" onclick="runCode()">
+                        <i class="fas fa-play"></i> Run
+                    </button>
+                    <button class="btn btn-success" onclick="submitCode()">
+                        <i class="fas fa-check"></i> Submit
+                    </button>
+                </div>
+            </div>
+
+            <div class="terminal">
+                <div class="terminal-header">
+                    <h3>Output</h3>
+                    <button class="btn btn-outline" onclick="clearTerminal()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+                <div class="terminal-output" id="terminal-output"></div>
+            </div>
+
+            <div class="rewards-panel">
+                <div class="rewards-header">
+                    <h3>Rewards</h3>
+                </div>
+                <div class="rewards-content">
+                    <div class="reward-card">
+                        <div class="reward-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="reward-value" id="points-value">0</div>
+                        <div class="reward-label">Points Earned</div>
+                    </div>
+
+                    <div class="reward-card">
+                        <div class="reward-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="reward-value" id="challenges-completed">0/5</div>
+                        <div class="reward-label">Challenges Completed</div>
+                        <div class="reward-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="challenges-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reward-card">
+                        <div class="reward-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <div class="reward-value" id="streak-value">0</div>
+                        <div class="reward-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="reward-toast">
+    <div class="toast-icon">
+        <i class="fas fa-star"></i>
+    </div>
+    <div class="toast-message">You earned 50 points!</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+<script>
+    // Make challenges data available to the external JS file
+    window.challenges = {{ challenges|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/challenges.js') }}"></script>
+{% endblock %}

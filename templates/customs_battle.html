@@ -1,0 +1,819 @@
+{% extends 'base.html' %}
+
+{% block title %}CodeBattle - Customs Battle Arena{% endblock %}
+
+{% block styles %}
+  <style>
+    /* Customs Battle Arena Styles */
+    .customs-battle-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .customs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background-color: var(--bg-light);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      border-left: 4px solid #9b59b6;
+    }
+
+    .customs-title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .customs-title i {
+      font-size: 1.5rem;
+      color: #9b59b6;
+    }
+
+    .customs-title h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .customs-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    .back-button {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+
+    .back-button:hover {
+      color: var(--text-primary);
+    }
+
+    /* Matchmaking Screen */
+    .customs-matchmaking-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 2rem;
+      background-color: var(--bg-light);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    .customs-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .customs-card {
+      background-color: var(--bg-lighter);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      box-shadow: var(--box-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: var(--transition);
+      border-left: 4px solid transparent;
+    }
+
+    .customs-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .customs-card.ranked {
+      border-left-color: #e74c3c;
+    }
+
+    .customs-card.unranked {
+      border-left-color: #3498db;
+    }
+
+    .customs-card.private {
+      border-left-color: #2ecc71;
+    }
+
+    .customs-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .customs-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.25rem;
+    }
+
+    .customs-card.ranked .customs-card-icon {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+
+    .customs-card.unranked .customs-card-icon {
+      background-color: rgba(52, 152, 219, 0.2);
+      color: #3498db;
+    }
+
+    .customs-card.private .customs-card-icon {
+      background-color: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+    }
+
+    .customs-card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .customs-card-description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .customs-card-footer {
+      margin-top: auto;
+    }
+
+    .customs-btn {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .customs-btn.ranked {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .customs-btn.ranked:hover {
+      background-color: #c0392b;
+    }
+
+    .customs-btn.unranked {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .customs-btn.unranked:hover {
+      background-color: #2980b9;
+    }
+
+    .customs-btn.private {
+      background-color: #2ecc71;
+      color: white;
+    }
+
+    .customs-btn.private:hover {
+      background-color: #27ae60;
+    }
+
+    /* Searching Indicator */
+    .customs-searching {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .customs-searching.show {
+      display: flex;
+    }
+
+    .customs-searching-animation {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+
+    .customs-searching-animation div {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #9b59b6;
+      animation: customs-searching 1.2s linear infinite;
+    }
+
+    .customs-searching-animation div:nth-child(1) {
+      top: 8px;
+      left: 8px;
+      animation-delay: 0s;
+    }
+
+    .customs-searching-animation div:nth-child(2) {
+      top: 8px;
+      left: 32px;
+      animation-delay: -0.4s;
+    }
+
+    .customs-searching-animation div:nth-child(3) {
+      top: 8px;
+      left: 56px;
+      animation-delay: -0.8s;
+    }
+
+    .customs-searching-animation div:nth-child(4) {
+      top: 32px;
+      left: 8px;
+      animation-delay: -0.4s;
+    }
+
+    .customs-searching-animation div:nth-child(5) {
+      top: 32px;
+      left: 32px;
+      animation-delay: -0.8s;
+    }
+
+    .customs-searching-animation div:nth-child(6) {
+      top: 32px;
+      left: 56px;
+      animation-delay: -1.2s;
+    }
+
+    .customs-searching-animation div:nth-child(7) {
+      top: 56px;
+      left: 8px;
+      animation-delay: -0.8s;
+    }
+
+    .customs-searching-animation div:nth-child(8) {
+      top: 56px;
+      left: 32px;
+      animation-delay: -1.2s;
+    }
+
+    .customs-searching-animation div:nth-child(9) {
+      top: 56px;
+      left: 56px;
+      animation-delay: -1.6s;
+    }
+
+    @keyframes customs-searching {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .customs-searching-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .customs-searching-info {
+      color: var(--text-secondary);
+      max-width: 400px;
+    }
+
+    .customs-cancel-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .customs-cancel-btn:hover {
+      background-color: #c0392b;
+    }
+
+    /* Private Battle Section */
+    .customs-private-section {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background-color: var(--bg-lighter);
+      border-radius: var(--border-radius);
+      border-left: 4px solid #2ecc71;
+    }
+
+    .customs-private-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .customs-private-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .customs-private-title i {
+      color: #2ecc71;
+    }
+
+    .customs-private-form {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .customs-private-input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--border-radius);
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+
+    .customs-private-input:focus {
+      outline: none;
+      border-color: #2ecc71;
+    }
+
+    /* Battle Interface */
+    #customs-battle-interface {
+      display: none;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="customs-battle-container">
+    <div class="customs-header">
+      <div class="customs-title">
+        <i class="fas fa-crown"></i>
+        <div>
+          <h2>Customs Battle Arena</h2>
+          <div class="customs-subtitle">Enhanced competitive coding battles with real-time features</div>
+        </div>
+      </div>
+      <button class="back-button" onclick="window.location.href='{{ url_for('battle') }}'">
+        <i class="fas fa-arrow-left"></i> Back to Battle Arena
+      </button>
+    </div>
+
+    <!-- Matchmaking Screen -->
+    <div id="customs-matchmaking-screen" class="customs-matchmaking-screen">
+      <div class="customs-options">
+        <div class="customs-card ranked">
+          <div class="customs-card-header">
+            <div class="customs-card-icon">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <h3 class="customs-card-title">Ranked Battle</h3>
+          </div>
+          <div class="customs-card-description">
+            <p>Compete against players of similar skill level. Your performance affects your ELO rating.</p>
+            <p>Current Rating: <strong id="user-rating-display">1250</strong></p>
+          </div>
+          <div class="customs-card-footer">
+            <button class="customs-btn ranked" id="ranked-battle-btn">
+              <i class="fas fa-fire"></i> Find Ranked Match
+            </button>
+          </div>
+        </div>
+
+        <div class="customs-card unranked">
+          <div class="customs-card-header">
+            <div class="customs-card-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <h3 class="customs-card-title">Unranked Battle</h3>
+          </div>
+          <div class="customs-card-description">
+            <p>Practice your skills without affecting your rating. Quick matchmaking with any available player.</p>
+            <p>Great for trying new strategies or warming up.</p>
+          </div>
+          <div class="customs-card-footer">
+            <button class="customs-btn unranked" id="unranked-battle-btn">
+              <i class="fas fa-play"></i> Quick Unranked Match
+            </button>
+          </div>
+        </div>
+
+        <div class="customs-card private">
+          <div class="customs-card-header">
+            <div class="customs-card-icon">
+              <i class="fas fa-user-friends"></i>
+            </div>
+            <h3 class="customs-card-title">Private Battle</h3>
+          </div>
+          <div class="customs-card-description">
+            <p>Create a private battle and invite a friend. Share the battle code to start a 1v1 match.</p>
+            <p>Private battles don't affect your rating.</p>
+          </div>
+          <div class="customs-card-footer">
+            <button class="customs-btn private" id="create-private-btn">
+              <i class="fas fa-plus"></i> Create Private Battle
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="customs-private-section">
+        <div class="customs-private-header">
+          <div class="customs-private-title">
+            <i class="fas fa-link"></i> Join Private Battle
+          </div>
+        </div>
+        <p>Enter a battle code to join a private battle created by a friend.</p>
+        <div class="customs-private-form">
+          <input type="text" class="customs-private-input" id="battle-code-input" placeholder="Enter battle code (e.g. ABCD1234)">
+          <button class="customs-btn private" id="join-private-btn">
+            <i class="fas fa-sign-in-alt"></i> Join
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Searching Indicator -->
+    <div id="customs-searching" class="customs-searching">
+      <div class="customs-searching-animation">
+        <div></div><div></div><div></div>
+        <div></div><div></div><div></div>
+        <div></div><div></div><div></div>
+      </div>
+      <div class="customs-searching-text">Searching for opponent...</div>
+      <div class="customs-searching-info">
+        <p>Looking for a suitable opponent. This may take a few moments.</p>
+        <p>Current search: <span id="search-type-display">Ranked Battle</span></p>
+      </div>
+      <button class="customs-cancel-btn" id="cancel-search-btn">
+        <i class="fas fa-times"></i> Cancel Search
+      </button>
+    </div>
+
+    <!-- Battle Interface -->
+    <div id="customs-battle-interface">
+      <!-- This will be populated with the enhanced battle interface -->
+    </div>
+  </div>
+
+  <!-- Share Link Modal -->
+  <div id="customs-share-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Private Battle Created</h3>
+        <button class="modal-close" id="close-share-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Share this battle code with your friend:</p>
+        <div class="battle-code-display">
+          <span id="battle-code-display">ABCD1234</span>
+          <button id="copy-code-btn" class="copy-btn">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+        <p class="modal-note">Your friend can enter this code in the "Join Private Battle" section.</p>
+      </div>
+      <div class="modal-footer">
+        <p>Waiting for opponent to join...</p>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    /**
+     * Customs Battle Module
+     */
+    const CustomsBattle = {
+      socket: null,
+      battleId: null,
+      searchType: null,
+
+      /**
+       * Initialize the customs battle page
+       */
+      init: function() {
+        // Initialize Socket.IO connection
+        this.socket = io.connect(window.location.protocol + '//' + window.location.host);
+
+        // Set up event listeners
+        this.setupEventListeners();
+
+        // Update user rating display
+        this.updateUserRating();
+
+        // Check for battle code in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const battleCode = urlParams.get('code');
+
+        if (battleCode) {
+          document.getElementById('battle-code-input').value = battleCode;
+          // Auto-join after a short delay
+          setTimeout(() => {
+            this.joinPrivateBattle(battleCode);
+          }, 500);
+        }
+      },
+
+      /**
+       * Set up event listeners
+       */
+      setupEventListeners: function() {
+        // Ranked battle button
+        document.getElementById('ranked-battle-btn').addEventListener('click', () => {
+          this.startSearch('ranked');
+        });
+
+        // Unranked battle button
+        document.getElementById('unranked-battle-btn').addEventListener('click', () => {
+          this.startSearch('unranked');
+        });
+
+        // Create private battle button
+        document.getElementById('create-private-btn').addEventListener('click', () => {
+          this.createPrivateBattle();
+        });
+
+        // Join private battle button
+        document.getElementById('join-private-btn').addEventListener('click', () => {
+          const battleCode = document.getElementById('battle-code-input').value.trim();
+          if (battleCode) {
+            this.joinPrivateBattle(battleCode);
+          } else {
+            alert('Please enter a valid battle code');
+          }
+        });
+
+        // Cancel search button
+        document.getElementById('cancel-search-btn').addEventListener('click', () => {
+          this.cancelSearch();
+        });
+
+        // Close share modal button
+        document.getElementById('close-share-modal').addEventListener('click', () => {
+          document.getElementById('customs-share-modal').classList.remove('show');
+        });
+
+        // Copy battle code button
+        document.getElementById('copy-code-btn').addEventListener('click', () => {
+          const battleCode = document.getElementById('battle-code-display').textContent;
+          navigator.clipboard.writeText(battleCode).then(() => {
+            const copyBtn = document.getElementById('copy-code-btn');
+            copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+              copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            }, 2000);
+          });
+        });
+
+        // Socket.IO event listeners
+        this.setupSocketListeners();
+      },
+
+      /**
+       * Set up Socket.IO event listeners
+       */
+      setupSocketListeners: function() {
+        // Connection events
+        this.socket.on('connect', () => {
+          console.log('Connected to server');
+        });
+
+        this.socket.on('disconnect', () => {
+          console.log('Disconnected from server');
+        });
+
+        // Matchmaking events
+        this.socket.on('customs_matchmaking_status', (data) => {
+          console.log('Matchmaking status:', data);
+
+          if (data.status === 'searching') {
+            // Update search type display
+            document.getElementById('search-type-display').textContent =
+              this.searchType === 'ranked' ? 'Ranked Battle' : 'Unranked Battle';
+          } else if (data.status === 'cancelled') {
+            this.hideSearching();
+          }
+        });
+
+        // Battle found event
+        this.socket.on('customs_battle_found', (data) => {
+          console.log('Battle found:', data);
+
+          // Store battle data
+          this.battleId = data.battle_id;
+
+          // Hide searching indicator
+          this.hideSearching();
+
+          // Show battle interface
+          this.showBattleInterface(data);
+        });
+
+        // Private battle events
+        this.socket.on('customs_private_battle_created', (data) => {
+          console.log('Private battle created:', data);
+
+          // Store battle ID
+          this.battleId = data.battle_id;
+
+          // Show share modal
+          document.getElementById('battle-code-display').textContent = data.battle_code;
+          document.getElementById('customs-share-modal').classList.add('show');
+        });
+
+        this.socket.on('customs_private_battle_joined', (data) => {
+          console.log('Private battle joined:', data);
+
+          // Hide share modal if open
+          document.getElementById('customs-share-modal').classList.remove('show');
+
+          // Show battle interface
+          this.showBattleInterface(data);
+        });
+
+        // Error events
+        this.socket.on('customs_error', (data) => {
+          console.error('Customs error:', data);
+          alert(data.message);
+
+          // Hide searching indicator if showing
+          this.hideSearching();
+        });
+      },
+
+      /**
+       * Update user rating display
+       */
+      updateUserRating: function() {
+        // Get user data from Auth module
+        const user = Auth.getCurrentUser();
+        if (user) {
+          document.getElementById('user-rating-display').textContent = user.rating || 1000;
+        }
+      },
+
+      /**
+       * Start search for opponent
+       * @param {string} type Search type ('ranked', 'unranked')
+       */
+      startSearch: function(type) {
+        this.searchType = type;
+
+        // Show searching indicator
+        document.getElementById('customs-matchmaking-screen').style.display = 'none';
+        document.getElementById('customs-searching').classList.add('show');
+
+        // Get user data
+        const user = Auth.getCurrentUser();
+
+        // Emit matchmaking event
+        this.socket.emit('customs_join_matchmaking', {
+          type: type,
+          username: user ? user.name : 'Anonymous',
+          rating: user ? user.rating : 1000
+        });
+      },
+
+      /**
+       * Cancel search
+       */
+      cancelSearch: function() {
+        // Emit cancel event
+        this.socket.emit('customs_cancel_matchmaking');
+
+        // Hide searching indicator
+        this.hideSearching();
+      },
+
+      /**
+       * Hide searching indicator
+       */
+      hideSearching: function() {
+        document.getElementById('customs-searching').classList.remove('show');
+        document.getElementById('customs-matchmaking-screen').style.display = 'block';
+      },
+
+      /**
+       * Create private battle
+       */
+      createPrivateBattle: function() {
+        // Get user data
+        const user = Auth.getCurrentUser();
+
+        // Emit create private battle event
+        this.socket.emit('customs_create_private_battle', {
+          username: user ? user.name : 'Anonymous',
+          rating: user ? user.rating : 1000
+        });
+      },
+
+      /**
+       * Join private battle
+       * @param {string} battleCode Battle code to join
+       */
+      joinPrivateBattle: function(battleCode) {
+        // Get user data
+        const user = Auth.getCurrentUser();
+
+        // Emit join private battle event
+        this.socket.emit('customs_join_private_battle', {
+          battle_code: battleCode,
+          username: user ? user.name : 'Anonymous',
+          rating: user ? user.rating : 1000
+        });
+
+        // Show searching indicator
+        document.getElementById('customs-matchmaking-screen').style.display = 'none';
+        document.getElementById('customs-searching').classList.add('show');
+        document.getElementById('search-type-display').textContent = 'Private Battle';
+      },
+
+      /**
+       * Show battle interface
+       * @param {Object} data Battle data
+       */
+      showBattleInterface: function(data) {
+        // Hide matchmaking screen and searching indicator
+        document.getElementById('customs-matchmaking-screen').style.display = 'none';
+        document.getElementById('customs-searching').classList.remove('show');
+
+        // Show battle interface
+        const battleInterface = document.getElementById('customs-battle-interface');
+        battleInterface.style.display = 'block';
+
+        // Load battle interface content
+        this.loadBattleInterface(data);
+      },
+
+      /**
+       * Load battle interface content
+       * @param {Object} data Battle data
+       */
+      loadBattleInterface: function(data) {
+        // Redirect to the enhanced battle interface
+        const battleId = data.battle_id;
+        const opponentName = data.opponent ? data.opponent.username : 'Unknown';
+        const opponentRating = data.opponent ? data.opponent.rating : '1000';
+
+        // Create URL with parameters
+        const url = `/customs-battle-interface?id=${battleId}&opponent=${encodeURIComponent(opponentName)}&rating=${opponentRating}`;
+
+        // Redirect to the enhanced battle interface
+        window.location.href = url;
+      }
+    };
+
+    /**
+     * Authentication Module (simplified)
+     */
+    const Auth = {
+      /**
+       * Get current user data
+       * @returns {Object|null} User data or null if not logged in
+       */
+      getCurrentUser: function() {
+        const userData = localStorage.getItem('user');
+        return userData ? JSON.parse(userData) : null;
+      }
+    };
+
+    // Initialize customs battle when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      CustomsBattle.init();
+    });
+  </script>
+{% endblock %}

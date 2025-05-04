@@ -1,0 +1,2644 @@
+{% extends 'base.html' %}
+
+{% block title %}CodeBattle - Battle Arena{% endblock %}
+
+{% block styles %}
+  <style>
+    /* Battle Arena Styles */
+
+    /* Battle Arena Styles */
+    .battle-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .battle-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background-color: var(--bg-light);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    .opponent-info, .your-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .opponent-info img, .your-info img {
+      border-radius: 50%;
+      border: 2px solid var(--primary);
+    }
+
+    .battle-status {
+      text-align: center;
+    }
+
+    .timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--warning);
+    }
+
+    .battle-title {
+      text-align: center;
+    }
+
+    .battle-title h2 {
+      margin-bottom: 0.25rem;
+    }
+
+    .difficulty {
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .difficulty.easy {
+      background-color: rgba(76, 209, 55, 0.2);
+      color: var(--success);
+    }
+
+    .difficulty.medium {
+      background-color: rgba(251, 197, 49, 0.2);
+      color: var(--warning);
+    }
+
+    .difficulty.hard {
+      background-color: rgba(232, 65, 24, 0.2);
+      color: var(--danger);
+    }
+
+    .rating {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Battle Content */
+    .battle-content {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      gap: 1rem;
+    }
+
+    .problem-description {
+      background-color: var(--bg-light);
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow-y: auto;
+    }
+
+    .problem-description h3 {
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .description-text {
+      font-size: 0.95rem;
+    }
+
+    .description-text p {
+      margin-bottom: 1rem;
+    }
+
+    .description-text code {
+      background-color: var(--bg-dark);
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px;
+      font-family: 'Consolas', monospace;
+    }
+
+    .example {
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background-color: var(--bg-lighter);
+      border-radius: var(--border-radius);
+    }
+
+    .example pre {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: 'Consolas', monospace;
+    }
+
+    .constraints ul {
+      list-style: inside;
+      margin-left: 1rem;
+    }
+
+    /* Coding Area */
+    .coding-area {
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-light);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--box-shadow);
+    }
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background-color: var(--bg-lighter);
+    }
+
+    #language-select {
+      padding: 0.5rem;
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      border: 1px solid var(--text-secondary);
+      border-radius: var(--border-radius);
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .run-btn, .submit-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .run-btn {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      border: 1px solid var(--text-secondary);
+    }
+
+    .submit-btn {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    #code-editor {
+      flex: 1;
+      min-height: 300px;
+    }
+
+    .terminal {
+      background-color: var(--bg-lighter);
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    .terminal-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .clear-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .clear-btn:hover {
+      color: var(--text-primary);
+    }
+
+    #terminal-output {
+      font-family: 'Consolas', monospace;
+      white-space: pre-wrap;
+      min-height: 100px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    /* Opponent Status */
+    .opponent-status {
+      padding: 1rem;
+      background-color: var(--bg-light);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    .status-header {
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .test-cases {
+      background-color: var(--bg-light);
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    .test-case {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      background-color: var(--bg-lighter);
+      border-radius: var(--border-radius);
+    }
+
+    .test-case.passed {
+      border-left: 3px solid var(--success);
+    }
+
+    .test-case.failed {
+      border-left: 3px solid var(--danger);
+    }
+
+    .test-case.running {
+      border-left: 3px solid var(--warning);
+    }
+
+    .test-case.pending {
+      border-left: 3px solid var(--text-secondary);
+    }
+
+    .opponent-progress {
+      margin-top: 2rem;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background-color: var(--bg-dark);
+      border-radius: 4px;
+      margin: 0.5rem 0;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: var(--primary);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: var(--bg-light);
+      border-radius: var(--border-radius);
+      width: 90%;
+      max-width: 500px;
+      box-shadow: var(--box-shadow);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .modal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .close-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .link-container {
+      display: flex;
+      margin-top: 1rem;
+      background-color: var(--bg-tertiary);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #share-link-input {
+      flex: 1;
+      background-color: transparent;
+      border: none;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    #copy-link-btn {
+      background-color: var(--accent-primary);
+      border: none;
+      color: white;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    #copy-link-btn:hover {
+      background-color: var(--accent-secondary);
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .note {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    /* Matchmaking Styles */
+    .matchmaking-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 60px);
+      background-color: var(--bg-primary);
+      background-image: radial-gradient(circle at top right, rgba(114, 137, 218, 0.1), transparent 70%);
+    }
+
+    .matchmaking-content {
+      background-color: var(--bg-secondary);
+      border-radius: var(--border-radius);
+      padding: 2.5rem;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .section-title {
+      color: var(--text-primary);
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-title:after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 3px;
+    }
+
+    .opponent-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+
+    .opponent-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .opponent-btn {
+      padding: 1rem 1.5rem;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 180px;
+      box-shadow: var(--box-shadow);
+    }
+
+    .primary-btn {
+      background-color: var(--accent-primary);
+      color: white;
+    }
+
+    .primary-btn:hover {
+      background-color: var(--accent-secondary);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(88, 101, 242, 0.3);
+    }
+
+    .accent-btn {
+      background-color: #ff9966;
+      background-image: linear-gradient(to right, #ff9966, #ff5e62);
+      color: white;
+    }
+
+    .accent-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(255, 94, 98, 0.3);
+    }
+
+    .bot-section {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .bot-title {
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+
+    .difficulty-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .difficulty-btn {
+      padding: 1rem;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    .difficulty-btn.easy {
+      background-color: rgba(67, 181, 129, 0.2);
+      color: var(--success);
+      border: 1px solid rgba(67, 181, 129, 0.3);
+    }
+
+    .difficulty-btn.medium {
+      background-color: rgba(250, 166, 26, 0.2);
+      color: var(--warning);
+      border: 1px solid rgba(250, 166, 26, 0.3);
+    }
+
+    .difficulty-btn.hard {
+      background-color: rgba(240, 71, 71, 0.2);
+      color: var(--error);
+      border: 1px solid rgba(240, 71, 71, 0.3);
+    }
+
+    .difficulty-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+
+    .difficulty-btn .rating {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    .searching-indicator {
+      text-align: center;
+    }
+
+    .searching-animation {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      background-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+
+    .matchmaking-status {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .cancel-btn {
+      padding: 0.8rem 1.5rem;
+      background-color: var(--error);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 600;
+    }
+
+    .cancel-btn:hover {
+      background-color: #d83c3e;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="dark-theme">
+  <nav class="navbar">
+    <div class="logo">
+      <h1>CodeBattle</h1>
+    </div>
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="battle.html" class="active">Battle Arena</a>
+      <a href="user.html">Profile</a>
+      <a href="login.html">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Matchmaking Screen -->
+  <div id="matchmaking-screen" class="matchmaking-container">
+    <div class="matchmaking-content">
+      <h2 class="section-title">Select Opponent</h2>
+
+      <div class="opponent-options">
+        <h3 class="opponent-subtitle">Choose your opponent</h3>
+        <div class="opponent-buttons">
+          <button id="find-real-player" class="opponent-btn primary-btn">
+            <i class="fas fa-user"></i>
+            <span>Find Real Player</span>
+          </button>
+          <button id="quick-match" class="opponent-btn accent-btn">
+            <i class="fas fa-bolt"></i>
+            <span>Quick Match</span>
+          </button>
+        </div>
+
+        <div class="bot-section">
+          <h4 class="bot-title">Practice with Bot</h4>
+          <div class="difficulty-buttons">
+            <button class="difficulty-btn easy" data-difficulty="easy">
+              <i class="fas fa-robot"></i>
+              <span>Easy</span>
+              <span class="rating">Rating: ~800</span>
+            </button>
+            <button class="difficulty-btn medium" data-difficulty="medium">
+              <i class="fas fa-robot"></i>
+              <span>Medium</span>
+              <span class="rating">Rating: ~1200</span>
+            </button>
+            <button class="difficulty-btn hard" data-difficulty="hard">
+              <i class="fas fa-robot"></i>
+              <span>Hard</span>
+              <span class="rating">Rating: ~1600</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="share-section">
+        <p class="share-text">Or create a private match and invite a friend</p>
+        <button id="share-link" class="share-btn">
+          <i class="fas fa-share-alt"></i>
+          Generate Share Link
+        </button>
+      </div>
+
+      <div id="searching-indicator" class="searching-indicator" style="display: none;">
+        <div class="searching-animation">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <p class="matchmaking-status">Searching for opponent...</p>
+        <button id="cancel-matchmaking" class="cancel-btn">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Battle Container (Initially Hidden) -->
+  <div id="battle-container" class="battle-container" style="display: none;">
+    <div class="battle-header">
+      <div class="opponent-info">
+        <img src="https://via.placeholder.com/40" alt="Opponent Avatar">
+        <div>
+          <h3>Waiting for opponent...</h3>
+          <p>Rating: -</p>
+        </div>
+      </div>
+      <div class="battle-status">
+        <div class="timer" id="time-remaining">30:00</div>
+        <div class="battle-title">
+          <h2>Two Sum</h2>
+          <span class="difficulty easy">Easy</span>
+          <div class="rating">Rating: 1000</div>
+        </div>
+      </div>
+      <div class="your-info">
+        <img src="https://via.placeholder.com/40" alt="Your Avatar">
+        <div>
+          <h3 id="user-name">You</h3>
+          <p>Rating: <span id="user-rating">-</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="battle-content">
+      <div class="problem-description">
+        <h3>Problem: Two Sum</h3>
+        <div class="description-text">
+          <p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to target.</p>
+          <p>You may assume that each input would have exactly one solution, and you may not use the same element twice.</p>
+          <p>You can return the answer in any order.</p>
+
+          <div class="example">
+            <p><strong>Example 1:</strong></p>
+            <pre>Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].</pre>
+          </div>
+
+          <div class="example">
+            <p><strong>Example 2:</strong></p>
+            <pre>Input: nums = [3,2,4], target = 6
+Output: [1,2]</pre>
+          </div>
+
+          <div class="constraints">
+            <p><strong>Constraints:</strong></p>
+            <ul>
+              <li>2 ≤ nums.length ≤ 10<sup>4</sup></li>
+              <li>-10<sup>9</sup> ≤ nums[i] ≤ 10<sup>9</sup></li>
+              <li>-10<sup>9</sup> ≤ target ≤ 10<sup>9</sup></li>
+              <li>Only one valid answer exists.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-editor-container">
+        <div class="editor-header">
+          <select id="language-select">
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="java">Java</option>
+            <option value="cpp">C++</option>
+          </select>
+          <div class="editor-actions">
+            <button class="run-btn"><i class="fas fa-play"></i> Run</button>
+            <button class="submit-btn"><i class="fas fa-check"></i> Submit</button>
+            <button class="clear-btn"><i class="fas fa-trash"></i> Clear</button>
+          </div>
+        </div>
+        <div id="code-editor"></div>
+        <div class="terminal">
+          <div class="terminal-header">
+            <span>Terminal</span>
+          </div>
+          <div id="terminal-output">> Ready to code...</div>
+        </div>
+      </div>
+
+      <div class="battle-progress">
+        <div class="progress-section">
+          <h3>Your Progress</h3>
+          <div class="progress-bar">
+            <div class="progress" style="width: 0%"></div>
+          </div>
+          <div class="test-cases">
+            <div class="test-case pending">
+              <span class="test-number">1</span>
+              <span class="test-status">○</span>
+            </div>
+            <div class="test-case pending">
+              <span class="test-number">2</span>
+              <span class="test-status">○</span>
+            </div>
+            <div class="test-case pending">
+              <span class="test-number">3</span>
+              <span class="test-status">○</span>
+            </div>
+            <div class="test-case pending">
+              <span class="test-number">4</span>
+              <span class="test-status">○</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-section">
+          <h3>Opponent's Progress</h3>
+          <div class="progress-bar">
+            <div class="opponent-progress" style="width: 0%"></div>
+          </div>
+          <div class="test-cases">
+            <div class="opponent-test-case pending">
+              <span class="test-number">1</span>
+              <span class="test-status">○</span>
+            </div>
+            <div class="opponent-test-case pending">
+              <span class="test-number">2</span>
+              <span class="test-status">○</span>
+            </div>
+            <div class="opponent-test-case pending">
+              <span class="test-number">3</span>
+              <span class="test-status">○</span>
+            </div>
+            <div class="opponent-test-case pending">
+              <span class="test-number">4</span>
+              <span class="test-status">○</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="warning-modal" class="modal">
+    <div class="modal-content">
+      <h3>Warning!</h3>
+      <p>You have switched tabs. Please stay on this page during the battle.</p>
+      <p id="warning-count">Warnings: 0/3</p>
+      <button id="acknowledge-btn">Acknowledge</button>
+    </div>
+  </div>
+
+  <div id="share-link-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Share Battle Link</h3>
+        <button id="close-share-modal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Share this link with a friend to battle:</p>
+        <div class="link-container">
+          <input type="text" id="share-link-input" readonly>
+          <button id="copy-link-btn" onclick="Battle.copyLinkToClipboard()">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <p class="note">Your friend will join your battle room when they open this link</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      Auth.protectRoute();
+
+      // Update user info
+      const user = Auth.getCurrentUser();
+      if (user) {
+        // Update user name
+        const yourName = document.getElementById('user-name');
+        if (yourName) {
+          yourName.textContent = user.name;
+        }
+
+        // Update user rating
+        const yourRating = document.querySelector('.your-info .rating');
+        if (yourRating) {
+          yourRating.textContent = `Rating: ${user.rating}`;
+        }
+      }
+
+      // Logout functionality
+      const logoutLinks = document.querySelectorAll('a[href="login.html"]');
+      logoutLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          Auth.logout();
+        });
+      });
+    });
+  </script>
+</style>
+{% endblock %}
+
+{% block content %}
+  <div class="battle-container">
+    <!-- Matchmaking Screen -->
+    <div id="matchmaking-screen">
+      <div class="matchmaking-header">
+        <h2>Code Battle</h2>
+        <p>Challenge yourself against other coders or practice with our AI opponents. Choose your preferred battle mode below.</p>
+      </div>
+
+      <div class="opponent-options">
+        <div class="option-card">
+          <h3>Real Player</h3>
+          <p>Battle against real players with similar skill levels. Test your coding skills in a competitive environment.</p>
+          <div class="option-buttons">
+            <button id="find-real-player" class="btn btn-primary">
+              <i class="fas fa-user"></i> Find Real Player
+            </button>
+            <button id="quick-match" class="btn btn-secondary">
+              <i class="fas fa-bolt"></i> Quick Match
+            </button>
+          </div>
+        </div>
+
+        <div class="option-card">
+          <h3>Practice with Bot</h3>
+          <p>Practice your coding skills against our AI opponents. Choose a difficulty level that matches your skill.</p>
+          <div class="option-buttons">
+            <div class="difficulty-buttons">
+              <button class="difficulty-btn easy" data-difficulty="easy">Easy</button>
+              <button class="difficulty-btn medium" data-difficulty="medium">Medium</button>
+              <button class="difficulty-btn hard" data-difficulty="hard">Hard</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="option-card custom-battle-card">
+          <h3>Customs Battle</h3>
+          <p>Experience our enhanced battle mode with real-time code viewing, detailed statistics, and ELO rating system.</p>
+          <div class="option-buttons">
+            <a href="{{ url_for('customs_battle') }}" class="btn btn-custom">
+              <i class="fas fa-crown"></i> Enter Customs
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div id="searching-indicator" class="searching-indicator">
+        <div class="spinner"></div>
+        <h3 class="matchmaking-status">Searching for opponent...</h3>
+        <p>This may take a few moments. Please wait while we find a suitable opponent for you.</p>
+        <button id="cancel-matchmaking" class="btn btn-outline cancel-btn">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+
+      <div class="share-section">
+        <h3>Private Battle</h3>
+        <p>Create a private battle and invite a friend to join. Share the link with them to start a coding duel.</p>
+        <button id="share-link" class="btn btn-primary">
+          <i class="fas fa-share-alt"></i> Generate Share Link
+        </button>
+      </div>
+    </div>
+
+    <!-- Battle Interface -->
+    <div id="battle-container">
+      <div class="battle-header">
+        <div class="battle-info">
+          <h3>Two Sum Challenge</h3>
+          <span class="problem-difficulty easy">Easy</span>
+        </div>
+        <div class="timer">
+          <i class="fas fa-clock"></i>
+          <span id="time-remaining">30:00</span>
+        </div>
+      </div>
+
+      <div class="battle-layout">
+        <div class="battle-main">
+          <div class="battle-stats-bar">
+            <div class="battle-stat">
+              <i class="fas fa-clock"></i>
+              <span id="elapsed-time">00:00</span>
+            </div>
+            <div class="battle-stat">
+              <i class="fas fa-keyboard"></i>
+              <span id="keystrokes">0</span>
+            </div>
+            <div class="battle-stat">
+              <i class="fas fa-code"></i>
+              <span id="code-length">0</span>
+            </div>
+            <div class="battle-stat">
+              <i class="fas fa-play"></i>
+              <span id="run-count">0</span>
+            </div>
+            <div class="battle-stat">
+              <i class="fas fa-check"></i>
+              <span id="submission-count">0</span>
+            </div>
+          </div>
+
+          <div class="code-section">
+            <div class="code-header">
+              <h3>Your Code</h3>
+              <select id="language-select" class="language-select">
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+              </select>
+            </div>
+            <div class="editor-container">
+              <div id="code-editor"></div>
+            </div>
+            <div class="code-actions">
+              <button class="btn btn-outline clear-btn">
+                <i class="fas fa-trash"></i> Clear
+              </button>
+              <button class="btn btn-primary run-btn">
+                <i class="fas fa-play"></i> Run
+              </button>
+              <button class="btn btn-success submit-btn">
+                <i class="fas fa-check"></i> Submit
+              </button>
+            </div>
+          </div>
+
+          <div class="terminal-section">
+            <div class="terminal-header">
+              <h3>Output</h3>
+              <button class="btn btn-outline clear-terminal-btn">
+                <i class="fas fa-trash"></i> Clear
+              </button>
+            </div>
+            <div id="terminal-output" class="terminal-output">
+              > Ready to code...
+            </div>
+          </div>
+        </div>
+
+        <div class="battle-sidebar">
+          <div class="opponent-section">
+            <div class="opponent-header">
+              <h3>Opponent</h3>
+            </div>
+            <div class="opponent-info">
+              <div class="opponent-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="opponent-name">Alex Johnson</div>
+              <div class="opponent-rating">Rating: 1450</div>
+            </div>
+
+            <div class="opponent-stats">
+              <div class="opponent-stat">
+                <span class="stat-label">Accuracy</span>
+                <span class="stat-value" id="opponent-accuracy">0%</span>
+              </div>
+              <div class="opponent-stat">
+                <span class="stat-label">Speed</span>
+                <span class="stat-value" id="opponent-speed">0 cpm</span>
+              </div>
+            </div>
+
+            <div class="opponent-progress-container">
+              <div class="progress-label">Progress</div>
+              <div class="progress-bar">
+                <div class="opponent-progress" style="width: 0%"></div>
+              </div>
+              <div class="progress-percentage" id="opponent-progress-percentage">0%</div>
+            </div>
+
+            <div class="opponent-code-preview">
+              <div class="preview-header">
+                <h4>Opponent's Code</h4>
+                <div class="preview-language" id="opponent-language">Python</div>
+              </div>
+              <div class="opponent-code-container">
+                <pre id="opponent-code-display" class="opponent-code">// Opponent's code will appear here when they start typing...</pre>
+              </div>
+            </div>
+
+            <div class="opponent-test-cases">
+              <h4>Test Cases</h4>
+              <div class="opponent-test-case pending">
+                <div class="test-status">○</div>
+                <span>Test Case 1</span>
+              </div>
+              <div class="opponent-test-case pending">
+                <div class="test-status">○</div>
+                <span>Test Case 2</span>
+              </div>
+              <div class="opponent-test-case pending">
+                <div class="test-status">○</div>
+                <span>Test Case 3</span>
+              </div>
+              <div class="opponent-test-case pending">
+                <div class="test-status">○</div>
+                <span>Test Case 4</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="problem-section">
+            <div class="problem-header">
+              <h3>Two Sum</h3>
+              <span class="problem-difficulty easy">Easy</span>
+            </div>
+            <div class="problem-description">
+              Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
+            </div>
+            <div class="test-cases">
+              <div class="test-case">
+                <h4>Test Case 1</h4>
+                <p><strong>Input:</strong> nums = [2,7,11,15], target = 9</p>
+                <p><strong>Output:</strong> [0,1]</p>
+              </div>
+              <div class="test-case">
+                <h4>Test Case 2</h4>
+                <p><strong>Input:</strong> nums = [3,2,4], target = 6</p>
+                <p><strong>Output:</strong> [1,2]</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Share Link Modal -->
+    <div id="share-link-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Share Battle Link</h3>
+          <button id="close-share-modal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Share this link with a friend to start a private battle:</p>
+          <input type="text" id="share-link-input" class="share-link-input" readonly>
+        </div>
+        <div class="modal-footer">
+          <button id="copy-link-btn" class="btn btn-primary">
+            <i class="fas fa-copy"></i> Copy Link
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div id="warning-modal" class="modal warning-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Warning!</h3>
+        </div>
+        <div class="modal-body">
+          <div class="warning-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="warning-message">
+            You are not allowed to switch tabs during a battle. This is considered cheating.
+          </div>
+          <div class="warning-count" id="warning-count">
+            Warnings: 1/3
+          </div>
+          <p>If you receive 3 warnings, you will be disqualified from the battle.</p>
+        </div>
+        <div class="modal-footer">
+          <button id="acknowledge-btn" class="btn btn-danger">
+            I Understand
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    /**
+     * Socket.IO Module for Real-time Matchmaking
+     */
+    const SocketManager = {
+      socket: null,
+      battleId: null,
+      opponent: null,
+      problem: null,
+
+      /**
+       * Initialize Socket.IO connection
+       */
+      init: function() {
+        // Connect to Socket.IO server
+        this.socket = io.connect(window.location.protocol + '//' + window.location.host);
+
+        // Set up event listeners
+        this.setupEventListeners();
+      },
+
+      /**
+       * Set up Socket.IO event listeners
+       */
+      setupEventListeners: function() {
+        // Connection events
+        this.socket.on('connect', () => {
+          console.log('Connected to server');
+        });
+
+        this.socket.on('disconnect', () => {
+          console.log('Disconnected from server');
+          // Show disconnection message
+          Battle.appendToTerminal('> Disconnected from server. Please refresh the page.');
+        });
+
+        // Matchmaking events
+        this.socket.on('matchmaking_status', (data) => {
+          console.log('Matchmaking status:', data);
+
+          // Update UI based on status
+          if (data.status === 'searching') {
+            // Show searching indicator
+            document.getElementById('searching-indicator').style.display = 'block';
+            document.querySelector('.matchmaking-status').textContent = data.message;
+          } else if (data.status === 'cancelled') {
+            // Hide searching indicator
+            document.getElementById('searching-indicator').style.display = 'none';
+            document.querySelector('.opponent-options').style.display = 'grid';
+            document.querySelector('.share-section').style.display = 'block';
+          }
+        });
+
+        this.socket.on('battle_found', (data) => {
+          console.log('Battle found:', data);
+
+          // Store battle data
+          this.battleId = data.battle_id;
+          this.opponent = data.opponent;
+          this.problem = data.problem;
+
+          // Start battle
+          Battle.startBattle({
+            id: this.opponent.username,
+            name: this.opponent.username,
+            rating: this.opponent.rating
+          }, this.problem);
+        });
+
+        // Private battle events
+        this.socket.on('private_battle_created', (data) => {
+          console.log('Private battle created:', data);
+
+          // Store battle ID
+          this.battleId = data.battle_id;
+
+          // Show share link modal
+          const shareLink = window.location.origin + '/battle?id=' + this.battleId;
+          document.getElementById('share-link-input').value = shareLink;
+          document.getElementById('share-link-modal').classList.add('show');
+        });
+
+        this.socket.on('battle_started', (data) => {
+          console.log('Battle started:', data);
+
+          // Store battle data
+          this.battleId = data.battle_id;
+          this.opponent = data.opponent;
+          this.problem = data.problem;
+
+          // Start battle
+          Battle.startBattle({
+            id: this.opponent.username,
+            name: this.opponent.username,
+            rating: this.opponent.rating
+          }, this.problem);
+        });
+
+        // Battle events
+        this.socket.on('opponent_action', (data) => {
+          console.log('Opponent action:', data);
+
+          // Handle different action types
+          if (data.action_type === 'code_submission') {
+            // Update opponent progress
+            Battle.updateOpponentProgress(data.progress);
+
+            // Update opponent code if provided
+            if (data.code) {
+              Battle.updateOpponentCode(data.code, data.language);
+            }
+
+            // Update opponent stats if provided
+            if (data.stats) {
+              Battle.updateOpponentStats(data.stats);
+            }
+          } else if (data.action_type === 'code_update') {
+            // Real-time code updates (typing)
+            if (data.code) {
+              Battle.updateOpponentCode(data.code, data.language);
+            }
+
+            // Update opponent stats if provided
+            if (data.stats) {
+              Battle.updateOpponentStats(data.stats);
+            }
+          } else if (data.action_type === 'test_result') {
+            // Update opponent test case
+            Battle.updateOpponentTestCase(data.test_id, data.status, data.details);
+          }
+        });
+
+        this.socket.on('battle_result', (data) => {
+          console.log('Battle result:', data);
+
+          // Prepare battle stats
+          const battleStats = {
+            result: data.result,
+            message: data.message,
+            oldRating: data.old_rating,
+            newRating: data.new_rating,
+            ratingChange: data.rating_change,
+            stats: data.stats || {}
+          };
+
+          // End battle based on result
+          if (data.result === 'win') {
+            Battle.endBattle('user-win', battleStats);
+          } else {
+            Battle.endBattle('opponent-win', battleStats);
+          }
+
+          // Show battle result modal
+          Battle.showBattleResultModal(battleStats);
+        });
+
+        this.socket.on('opponent_disconnected', (data) => {
+          console.log('Opponent disconnected:', data);
+
+          // Show message
+          Battle.appendToTerminal('> ' + data.message);
+
+          // End battle
+          Battle.endBattle('opponent-disconnected');
+        });
+
+        this.socket.on('error', (data) => {
+          console.error('Socket error:', data);
+
+          // Show error message
+          Battle.appendToTerminal('> Error: ' + data.message);
+        });
+      },
+
+      /**
+       * Join matchmaking queue
+       */
+      joinMatchmaking: function() {
+        // Get user data from Auth module
+        const user = Auth.getCurrentUser();
+
+        // Join matchmaking queue
+        this.socket.emit('join_matchmaking', {
+          username: user ? user.name : 'Anonymous',
+          rating: user ? user.rating : 1000
+        });
+      },
+
+      /**
+       * Cancel matchmaking
+       */
+      cancelMatchmaking: function() {
+        this.socket.emit('cancel_matchmaking');
+      },
+
+      /**
+       * Create a private battle
+       */
+      createPrivateBattle: function() {
+        // Get user data from Auth module
+        const user = Auth.getCurrentUser();
+
+        // Create private battle
+        this.socket.emit('create_private_battle', {
+          username: user ? user.name : 'Anonymous',
+          rating: user ? user.rating : 1000
+        });
+      },
+
+      /**
+       * Join a private battle
+       * @param {string} battleId Battle ID to join
+       */
+      joinPrivateBattle: function(battleId) {
+        // Get user data from Auth module
+        const user = Auth.getCurrentUser();
+
+        // Join private battle
+        this.socket.emit('join_private_battle', {
+          battle_id: battleId,
+          username: user ? user.name : 'Anonymous',
+          rating: user ? user.rating : 1000
+        });
+      },
+
+      /**
+       * Send battle action
+       * @param {string} actionType Action type
+       * @param {Object} data Action data
+       */
+      sendBattleAction: function(actionType, data = {}) {
+        if (!this.battleId) {
+          console.error('No active battle');
+          return;
+        }
+
+        // Send battle action
+        this.socket.emit('battle_action', {
+          battle_id: this.battleId,
+          action_type: actionType,
+          ...data
+        });
+      }
+    };
+
+    /**
+     * Authentication Module for CodeBattle
+     */
+    const Auth = {
+        /**
+         * Check if user is logged in
+         * @returns {boolean} True if user is logged in
+         */
+        isLoggedIn: function() {
+            return localStorage.getItem('user') !== null;
+        },
+
+        /**
+         * Get current user data
+         * @returns {Object|null} User data or null if not logged in
+         */
+        getCurrentUser: function() {
+            const userData = localStorage.getItem('user');
+            return userData ? JSON.parse(userData) : null;
+        },
+
+        /**
+         * Login user
+         * @param {Object} userData User data to store
+         */
+        login: function(userData) {
+            localStorage.setItem('user', JSON.stringify(userData));
+            window.location.href = '/';
+        },
+
+        /**
+         * Logout user
+         */
+        logout: function() {
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        },
+
+        /**
+         * Protect route - redirect to login if not authenticated
+         */
+        protectRoute: function() {
+            if (!this.isLoggedIn()) {
+                // For demo purposes, create a mock user if not logged in
+                const mockUser = {
+                    id: 'user123',
+                    name: 'John Smith',
+                    username: 'johnsmith',
+                    email: 'john@example.com',
+                    rating: 1250,
+                    battles: 42,
+                    wins: 28,
+                    losses: 14
+                };
+                this.login(mockUser);
+            }
+        }
+    };
+
+    /**
+     * Battle Module for CodeBattle
+     */
+    const Battle = {
+        // Battle state
+        state: {
+            inProgress: false,
+            timeRemaining: 1800, // 30 minutes in seconds
+            opponent: null,
+            problem: null,
+            userProgress: 0,
+            opponentProgress: 0,
+            testCases: [],
+            opponentTestCases: [],
+            timer: null,
+            editor: null,
+            warnings: 0
+        },
+
+        /**
+         * Initialize the battle page
+         */
+        init: function() {
+            // Initialize Ace editor
+            this.initEditor();
+
+            // Set up event listeners
+            this.setupEventListeners();
+
+            // Check for battle ID in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const battleId = urlParams.get('id');
+
+            if (battleId) {
+                // Join existing battle
+                this.joinBattle(battleId);
+            }
+        },
+
+        /**
+         * Initialize code editor
+         */
+        initEditor: function() {
+            const editor = ace.edit("code-editor");
+            editor.setTheme("ace/theme/monokai");
+            editor.session.setMode("ace/mode/python");
+            editor.setFontSize(14);
+
+            // Set initial code template
+            const pythonTemplate = `def two_sum(nums, target):
+    # Your solution here
+
+    return []
+
+# Example usage:
+# result = two_sum([2, 7, 11, 15], 9)
+# print(result)  # Should output [0, 1]`;
+
+            editor.setValue(pythonTemplate);
+
+            // Store editor reference
+            this.state.editor = editor;
+
+            // Initialize keystroke tracking
+            this.state.keystrokes = 0;
+            this.state.correctKeystrokes = 0;
+            this.state.submissionCount = 0;
+            this.state.runCount = 0;
+
+            // Track keystrokes
+            editor.on('change', (e) => {
+                // Update keystrokes count
+                if (e.action === 'insert') {
+                    this.state.keystrokes += e.lines.join('').length;
+                    this.state.correctKeystrokes += e.lines.join('').length;
+                } else if (e.action === 'remove') {
+                    this.state.keystrokes += 1; // Count deletion as one keystroke
+                }
+
+                // Update UI
+                document.getElementById('keystrokes').textContent = this.state.keystrokes;
+
+                // Update code length
+                const code = editor.getValue();
+                document.getElementById('code-length').textContent = code.length;
+
+                // Send code update to opponent every 2 seconds
+                if (!this.state.lastCodeUpdate || Date.now() - this.state.lastCodeUpdate > 2000) {
+                    this.state.lastCodeUpdate = Date.now();
+
+                    if (SocketManager.battleId) {
+                        const stats = this.collectCodeStats();
+                        SocketManager.sendBattleAction('code_update', {
+                            code: code,
+                            language: document.getElementById('language-select').value,
+                            stats: stats
+                        });
+                    }
+                }
+            });
+
+            // Handle language change
+            document.getElementById('language-select').addEventListener('change', function(e) {
+                const language = e.target.value;
+                Battle.changeLanguage(language);
+            });
+
+            // Update elapsed time
+            setInterval(() => {
+                if (this.state.inProgress) {
+                    const elapsedTime = this.state.timeRemaining ? 1800 - this.state.timeRemaining : 0;
+                    const minutes = Math.floor(elapsedTime / 60);
+                    const seconds = elapsedTime % 60;
+                    document.getElementById('elapsed-time').textContent =
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        },
+
+        /**
+         * Set up event listeners
+         */
+        setupEventListeners: function() {
+            // Find real player button
+            const findPlayerBtn = document.getElementById('find-real-player');
+            if (findPlayerBtn) {
+                findPlayerBtn.addEventListener('click', () => this.findOpponent('player'));
+            }
+
+            // Quick match button
+            const quickMatchBtn = document.getElementById('quick-match');
+            if (quickMatchBtn) {
+                quickMatchBtn.addEventListener('click', () => this.findOpponent('quick'));
+            }
+
+            // Bot difficulty buttons
+            const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+            difficultyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const difficulty = btn.getAttribute('data-difficulty');
+                    this.startBotMatch(difficulty);
+                });
+            });
+
+            // Cancel matchmaking button
+            const cancelBtn = document.getElementById('cancel-matchmaking');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', this.cancelMatchmaking.bind(this));
+            }
+
+            // Share link button
+            const shareBtn = document.getElementById('share-link');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', this.generateShareLink.bind(this));
+            }
+
+            // Close share modal button
+            const closeShareBtn = document.getElementById('close-share-modal');
+            if (closeShareBtn) {
+                closeShareBtn.addEventListener('click', () => {
+                    document.getElementById('share-link-modal').classList.remove('show');
+                });
+            }
+
+            // Run code button
+            const runBtn = document.querySelector('.run-btn');
+            if (runBtn) {
+                runBtn.addEventListener('click', this.runCode.bind(this));
+            }
+
+            // Submit code button
+            const submitBtn = document.querySelector('.submit-btn');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', this.submitCode.bind(this));
+            }
+
+            // Clear code button
+            const clearBtn = document.querySelector('.clear-btn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', this.clearCode.bind(this));
+            }
+
+            // Clear terminal button
+            const clearTerminalBtn = document.querySelector('.clear-terminal-btn');
+            if (clearTerminalBtn) {
+                clearTerminalBtn.addEventListener('click', () => {
+                    document.getElementById('terminal-output').innerHTML = '> Ready to code...';
+                });
+            }
+
+            // Acknowledge warning button
+            const acknowledgeBtn = document.getElementById('acknowledge-btn');
+            if (acknowledgeBtn) {
+                acknowledgeBtn.addEventListener('click', () => {
+                    document.getElementById('warning-modal').classList.remove('show');
+                });
+            }
+
+            // Copy link button
+            const copyLinkBtn = document.getElementById('copy-link-btn');
+            if (copyLinkBtn) {
+                copyLinkBtn.addEventListener('click', this.copyLinkToClipboard.bind(this));
+            }
+
+            // Tab visibility change
+            document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+        },
+
+        /**
+         * Find an opponent
+         * @param {string} type Type of opponent to find ('player', 'quick')
+         */
+        findOpponent: function(type) {
+            // Show searching indicator
+            document.getElementById('searching-indicator').style.display = 'block';
+
+            // Hide opponent options
+            document.querySelector('.opponent-options').style.display = 'none';
+            document.querySelector('.share-section').style.display = 'none';
+
+            // Join matchmaking queue
+            SocketManager.joinMatchmaking();
+        },
+
+        /**
+         * Start a match against a bot
+         * @param {string} difficulty Bot difficulty level
+         */
+        startBotMatch: function(difficulty) {
+            // Create bot opponent based on difficulty
+            let rating = 800;
+            if (difficulty === 'medium') rating = 1200;
+            if (difficulty === 'hard') rating = 1600;
+
+            const botOpponent = {
+                id: 'bot_' + difficulty,
+                name: difficulty.charAt(0).toUpperCase() + difficulty.slice(1) + ' Bot',
+                rating: rating,
+                isBot: true
+            };
+
+            // Start battle with bot
+            this.startBattle(botOpponent);
+
+            // In a real implementation, we would use Socket.IO to start a bot match
+            // For now, we'll just simulate it locally
+        },
+
+        /**
+         * Cancel matchmaking
+         */
+        cancelMatchmaking: function() {
+            // Cancel matchmaking via Socket.IO
+            SocketManager.cancelMatchmaking();
+        },
+
+        /**
+         * Generate a share link for a private battle
+         */
+        generateShareLink: function() {
+            // Create private battle via Socket.IO
+            SocketManager.createPrivateBattle();
+        },
+
+        /**
+         * Copy battle link to clipboard
+         */
+        copyLinkToClipboard: function() {
+            const linkInput = document.getElementById('share-link-input');
+            linkInput.select();
+            document.execCommand('copy');
+
+            // Show copied feedback
+            const copyBtn = document.getElementById('copy-link-btn');
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        },
+
+        /**
+         * Join an existing battle
+         * @param {string} battleId Battle ID to join
+         */
+        joinBattle: function(battleId) {
+            // For demo purposes, create a mock opponent
+            const opponent = {
+                id: 'opponent456',
+                name: 'Sarah Miller',
+                rating: 1350
+            };
+
+            // Start battle with opponent
+            this.startBattle(opponent);
+        },
+
+        /**
+         * Start a battle with an opponent
+         * @param {Object} opponent Opponent data
+         */
+        startBattle: function(opponent) {
+            // Set battle state
+            this.state.inProgress = true;
+            this.state.opponent = opponent;
+            this.state.problem = {
+                id: 'two-sum',
+                title: 'Two Sum',
+                difficulty: 'easy',
+                rating: 1000,
+                description: 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.'
+            };
+
+            // Initialize test cases
+            this.state.testCases = [
+                { id: 1, status: 'pending' },
+                { id: 2, status: 'pending' },
+                { id: 3, status: 'pending' },
+                { id: 4, status: 'pending' }
+            ];
+
+            this.state.opponentTestCases = [
+                { id: 1, status: 'pending' },
+                { id: 2, status: 'pending' },
+                { id: 3, status: 'pending' },
+                { id: 4, status: 'pending' }
+            ];
+
+            // Hide matchmaking screen
+            document.getElementById('matchmaking-screen').style.display = 'none';
+
+            // Show battle container
+            document.getElementById('battle-container').style.display = 'flex';
+
+            // Update UI with opponent info
+            this.updateOpponentInfo();
+
+            // Start timer
+            this.startTimer();
+
+            // If opponent is a bot, simulate their progress
+            if (opponent.isBot) {
+                this.simulateBotProgress();
+            }
+        },
+
+        /**
+         * Update opponent information in the UI
+         */
+        updateOpponentInfo: function() {
+            const opponent = this.state.opponent;
+
+            // Update opponent name
+            const opponentName = document.querySelector('.opponent-name');
+            if (opponentName) {
+                opponentName.textContent = opponent.name;
+            }
+
+            // Update opponent rating
+            const opponentRating = document.querySelector('.opponent-rating');
+            if (opponentRating) {
+                opponentRating.textContent = `Rating: ${opponent.rating}`;
+            }
+        },
+
+        /**
+         * Start the battle timer
+         */
+        startTimer: function() {
+            const timerElement = document.getElementById('time-remaining');
+
+            this.state.timer = setInterval(() => {
+                this.state.timeRemaining--;
+
+                if (this.state.timeRemaining <= 0) {
+                    // Time's up
+                    clearInterval(this.state.timer);
+                    this.endBattle('timeout');
+                    return;
+                }
+
+                // Update timer display
+                const minutes = Math.floor(this.state.timeRemaining / 60);
+                const seconds = this.state.timeRemaining % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        },
+
+        /**
+         * Simulate bot progress
+         */
+        simulateBotProgress: function() {
+            const difficulty = this.state.opponent.id.split('_')[1];
+            let solveTime = 0;
+
+            // Set solve time based on difficulty
+            switch (difficulty) {
+                case 'easy':
+                    solveTime = 120; // 2 minutes
+                    break;
+                case 'medium':
+                    solveTime = 90; // 1.5 minutes
+                    break;
+                case 'hard':
+                    solveTime = 60; // 1 minute
+                    break;
+                default:
+                    solveTime = 120;
+            }
+
+            // Calculate progress increment per second
+            const progressIncrement = 100 / (solveTime * 4);
+
+            // Update bot progress every second
+            const botInterval = setInterval(() => {
+                if (!this.state.inProgress) {
+                    clearInterval(botInterval);
+                    return;
+                }
+
+                this.state.opponentProgress += progressIncrement;
+
+                // Update progress bar
+                const progressBar = document.querySelector('.opponent-progress');
+                if (progressBar) {
+                    progressBar.style.width = `${Math.min(this.state.opponentProgress, 100)}%`;
+                }
+
+                // Update test cases
+                if (this.state.opponentProgress >= 25 && this.state.opponentTestCases[0].status === 'pending') {
+                    this.updateOpponentTestCase(1, 'passed');
+                }
+                if (this.state.opponentProgress >= 50 && this.state.opponentTestCases[1].status === 'pending') {
+                    this.updateOpponentTestCase(2, 'passed');
+                }
+                if (this.state.opponentProgress >= 75 && this.state.opponentTestCases[2].status === 'pending') {
+                    this.updateOpponentTestCase(3, 'passed');
+                }
+                if (this.state.opponentProgress >= 100 && this.state.opponentTestCases[3].status === 'pending') {
+                    this.updateOpponentTestCase(4, 'passed');
+                    this.endBattle('opponent-win');
+                }
+            }, 1000);
+        },
+
+        /**
+         * Update opponent test case status
+         * @param {number} id Test case ID
+         * @param {string} status New status ('pending', 'running', 'passed', 'failed')
+         */
+        updateOpponentTestCase: function(id, status) {
+            // Update state
+            const testCase = this.state.opponentTestCases.find(tc => tc.id === id);
+            if (testCase) {
+                testCase.status = status;
+            }
+
+            // Update UI
+            const testCaseElement = document.querySelector(`.opponent-test-case:nth-child(${id})`);
+            if (testCaseElement) {
+                // Remove all status classes
+                testCaseElement.classList.remove('pending', 'running', 'passed', 'failed');
+                // Add new status class
+                testCaseElement.classList.add(status);
+
+                // Update status icon
+                const statusIcon = testCaseElement.querySelector('.test-status');
+                if (statusIcon) {
+                    switch (status) {
+                        case 'pending':
+                            statusIcon.textContent = '○';
+                            break;
+                        case 'running':
+                            statusIcon.textContent = '◔';
+                            break;
+                        case 'passed':
+                            statusIcon.textContent = '✓';
+                            break;
+                        case 'failed':
+                            statusIcon.textContent = '✗';
+                            break;
+                    }
+                }
+            }
+        },
+
+        /**
+         * Change editor language
+         * @param {string} language Language to change to
+         */
+        changeLanguage: function(language) {
+            // Set editor mode
+            switch (language) {
+                case 'python':
+                    this.state.editor.session.setMode("ace/mode/python");
+                    this.setCodeTemplate('python');
+                    break;
+                case 'javascript':
+                    this.state.editor.session.setMode("ace/mode/javascript");
+                    this.setCodeTemplate('javascript');
+                    break;
+                case 'java':
+                    this.state.editor.session.setMode("ace/mode/java");
+                    this.setCodeTemplate('java');
+                    break;
+                case 'cpp':
+                    this.state.editor.session.setMode("ace/mode/c_cpp");
+                    this.setCodeTemplate('cpp');
+                    break;
+            }
+        },
+
+        /**
+         * Set code template based on language
+         * @param {string} language Language to set template for
+         */
+        setCodeTemplate: function(language) {
+            let template = '';
+
+            switch (language) {
+                case 'python':
+                    template = `def two_sum(nums, target):
+    # Your solution here
+
+    return []
+
+# Example usage:
+# result = two_sum([2, 7, 11, 15], 9)
+# print(result)  # Should output [0, 1]`;
+                    break;
+                case 'javascript':
+                    template = `/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+function twoSum(nums, target) {
+    // Your solution here
+
+    return [];
+}
+
+// Example usage:
+// const result = twoSum([2, 7, 11, 15], 9);
+// console.log(result);  // Should output [0, 1]`;
+                    break;
+                case 'java':
+                    template = `import java.util.*;
+
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        // Your solution here
+
+        return new int[]{};
+    }
+
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        int[] nums = {2, 7, 11, 15};
+        int target = 9;
+        int[] result = solution.twoSum(nums, target);
+        // Should output [0, 1]
+        System.out.println(Arrays.toString(result));
+    }
+}`;
+                    break;
+                case 'cpp':
+                    template = `#include <vector>
+#include <iostream>
+
+class Solution {
+public:
+    std::vector<int> twoSum(std::vector<int>& nums, int target) {
+        // Your solution here
+
+        return {};
+    }
+};
+
+// Example usage:
+// int main() {
+//     Solution solution;
+//     std::vector<int> nums = {2, 7, 11, 15};
+//     int target = 9;
+//     std::vector<int> result = solution.twoSum(nums, target);
+//     // Should output [0, 1]
+//     for (int i : result) {
+//         std::cout << i << " ";
+//     }
+//     return 0;
+// }`;
+                    break;
+            }
+
+            this.state.editor.setValue(template);
+        },
+
+        /**
+         * Run code
+         */
+        runCode: function() {
+            const code = this.state.editor.getValue();
+            const language = document.getElementById('language-select').value;
+
+            // Add to terminal
+            this.appendToTerminal(`> Running ${language} code...`);
+
+            // Increment run count
+            this.state.runCount = (this.state.runCount || 0) + 1;
+            document.getElementById('run-count').textContent = this.state.runCount;
+
+            // Simulate code execution
+            setTimeout(() => {
+                // Simulate test case results
+                const testCases = [
+                    { input: '[2,7,11,15], 9', expected: '[0,1]', actual: '[0,1]' },
+                    { input: '[3,2,4], 6', expected: '[1,2]', actual: '[1,2]' }
+                ];
+
+                let passedCount = 0;
+
+                testCases.forEach((testCase, index) => {
+                    const passed = Math.random() > 0.3; // 70% chance of passing
+
+                    if (passed) {
+                        this.appendToTerminal(`> Test case ${index + 1}: PASSED`);
+                        passedCount++;
+                    } else {
+                        this.appendToTerminal(`> Test case ${index + 1}: FAILED`);
+                        this.appendToTerminal(`  Input: ${testCase.input}`);
+                        this.appendToTerminal(`  Expected: ${testCase.expected}`);
+                        this.appendToTerminal(`  Actual: ${testCase.actual}`);
+                    }
+                });
+
+                // Calculate and display accuracy
+                const accuracy = Math.round((passedCount / testCases.length) * 100);
+                this.appendToTerminal(`> Execution completed with ${accuracy}% accuracy`);
+
+                // Send run results to opponent
+                if (SocketManager.battleId) {
+                    const stats = this.collectCodeStats();
+                    stats.testAccuracy = accuracy;
+
+                    SocketManager.sendBattleAction('code_update', {
+                        code: code,
+                        language: language,
+                        stats: stats
+                    });
+                }
+            }, 1000);
+        },
+
+        /**
+         * Submit code
+         */
+        submitCode: function() {
+            const code = this.state.editor.getValue();
+            const language = document.getElementById('language-select').value;
+
+            // Add to terminal
+            this.appendToTerminal(`> Submitting ${language} solution...`);
+
+            // Update user progress
+            this.state.userProgress = 0;
+
+            // Update progress bar
+            const progressBar = document.querySelector('.progress');
+            if (progressBar) {
+                progressBar.style.width = '0%';
+            }
+
+            // Reset test cases
+            this.state.testCases.forEach(testCase => {
+                testCase.status = 'pending';
+            });
+
+            // Gather statistics
+            const stats = this.collectCodeStats();
+
+            // Increment submission count
+            this.state.submissionCount = (this.state.submissionCount || 0) + 1;
+            document.getElementById('submission-count').textContent = this.state.submissionCount;
+
+            // Notify opponent via Socket.IO
+            if (SocketManager.battleId) {
+                SocketManager.sendBattleAction('code_submission', {
+                    progress: this.state.userProgress,
+                    code: code,
+                    language: language,
+                    stats: stats
+                });
+            }
+
+            // Simulate test case execution
+            this.simulateTestCaseExecution();
+        },
+
+        /**
+         * Collect code statistics
+         * @returns {Object} Code statistics
+         */
+        collectCodeStats: function() {
+            const code = this.state.editor.getValue();
+            const elapsedTime = this.state.timeRemaining ? 1800 - this.state.timeRemaining : 0;
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            return {
+                keystrokes: this.state.keystrokes || 0,
+                codeLength: code.length,
+                time: timeString,
+                accuracy: Math.round((this.state.correctKeystrokes || 0) / (this.state.keystrokes || 1) * 100),
+                speed: Math.round((this.state.keystrokes || 0) / (elapsedTime / 60 || 1)),
+                progress: Math.round(this.state.userProgress || 0)
+            };
+        },
+
+        /**
+         * Simulate test case execution
+         */
+        simulateTestCaseExecution: function() {
+            const testCases = this.state.testCases;
+            let currentTestCase = 0;
+
+            const runNextTestCase = () => {
+                if (currentTestCase >= testCases.length) {
+                    // All test cases completed
+                    if (testCases.every(tc => tc.status === 'passed')) {
+                        // All test cases passed
+                        this.appendToTerminal(`> All test cases passed!`);
+                        this.endBattle('user-win');
+                    } else {
+                        // Some test cases failed
+                        this.appendToTerminal(`> Some test cases failed. Please fix your solution and try again.`);
+                    }
+                    return;
+                }
+
+                const testCase = testCases[currentTestCase];
+
+                // Update test case status to running
+                this.updateTestCase(testCase.id, 'running');
+
+                // Simulate test case execution
+                setTimeout(() => {
+                    // 80% chance of passing
+                    const passed = Math.random() > 0.2;
+
+                    // Update test case status
+                    this.updateTestCase(testCase.id, passed ? 'passed' : 'failed');
+
+                    // Update progress
+                    this.state.userProgress += 25;
+                    const progressBar = document.querySelector('.progress');
+                    if (progressBar) {
+                        progressBar.style.width = `${this.state.userProgress}%`;
+                    }
+
+                    // Add result to terminal
+                    if (passed) {
+                        this.appendToTerminal(`> Test case ${testCase.id}: PASSED`);
+                    } else {
+                        this.appendToTerminal(`> Test case ${testCase.id}: FAILED`);
+                        // Add more details about the failure
+                        this.appendToTerminal(`  Expected: [0, 1]`);
+                        this.appendToTerminal(`  Actual: [1, 0]`);
+                    }
+
+                    // Run next test case
+                    currentTestCase++;
+                    runNextTestCase();
+                }, 1000);
+            };
+
+            // Start running test cases
+            runNextTestCase();
+        },
+
+        /**
+         * Update test case status
+         * @param {number} id Test case ID
+         * @param {string} status New status ('pending', 'running', 'passed', 'failed')
+         */
+        updateTestCase: function(id, status) {
+            // Update state
+            const testCase = this.state.testCases.find(tc => tc.id === id);
+            if (testCase) {
+                testCase.status = status;
+            }
+
+            // Update UI
+            const testCaseElement = document.querySelector(`.test-case:nth-child(${id})`);
+            if (testCaseElement) {
+                // Remove all status classes
+                testCaseElement.classList.remove('pending', 'running', 'passed', 'failed');
+                // Add new status class
+                testCaseElement.classList.add(status);
+
+                // Update status icon
+                const statusIcon = testCaseElement.querySelector('.test-status');
+                if (statusIcon) {
+                    switch (status) {
+                        case 'pending':
+                            statusIcon.textContent = '○';
+                            break;
+                        case 'running':
+                            statusIcon.textContent = '◔';
+                            break;
+                        case 'passed':
+                            statusIcon.textContent = '✓';
+                            break;
+                        case 'failed':
+                            statusIcon.textContent = '✗';
+                            break;
+                    }
+                }
+            }
+
+            // Notify opponent via Socket.IO
+            if (SocketManager.battleId) {
+                SocketManager.sendBattleAction('test_result', {
+                    test_id: id,
+                    status: status
+                });
+            }
+
+            // If all test cases passed, notify opponent of battle completion
+            if (status === 'passed' && this.state.testCases.every(tc => tc.status === 'passed')) {
+                if (SocketManager.battleId) {
+                    SocketManager.sendBattleAction('battle_complete');
+                }
+            }
+        },
+
+        /**
+         * Clear code editor
+         */
+        clearCode: function() {
+            const language = document.getElementById('language-select').value;
+            this.setCodeTemplate(language);
+        },
+
+        /**
+         * Update opponent's code display
+         * @param {string} code Opponent's code
+         * @param {string} language Opponent's programming language
+         */
+        updateOpponentCode: function(code, language) {
+            const codeDisplay = document.getElementById('opponent-code-display');
+            if (codeDisplay) {
+                // Truncate code if too long
+                const maxLength = 500;
+                const displayCode = code.length > maxLength
+                    ? code.substring(0, maxLength) + '...\n[Code truncated for display]'
+                    : code;
+
+                codeDisplay.textContent = displayCode;
+            }
+
+            // Update language display
+            const languageDisplay = document.getElementById('opponent-language');
+            if (languageDisplay && language) {
+                languageDisplay.textContent = language.charAt(0).toUpperCase() + language.slice(1);
+            }
+        },
+
+        /**
+         * Update opponent's statistics
+         * @param {Object} stats Opponent's statistics
+         */
+        updateOpponentStats: function(stats) {
+            // Update accuracy
+            const accuracyElement = document.getElementById('opponent-accuracy');
+            if (accuracyElement && stats.accuracy !== undefined) {
+                accuracyElement.textContent = stats.accuracy + '%';
+            }
+
+            // Update typing speed
+            const speedElement = document.getElementById('opponent-speed');
+            if (speedElement && stats.speed !== undefined) {
+                speedElement.textContent = stats.speed + ' cpm';
+            }
+
+            // Update progress percentage
+            const progressElement = document.getElementById('opponent-progress-percentage');
+            if (progressElement && stats.progress !== undefined) {
+                progressElement.textContent = stats.progress + '%';
+            }
+        },
+
+        /**
+         * Show battle result modal
+         * @param {Object} stats Battle statistics
+         */
+        showBattleResultModal: function(stats) {
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('battle-result-modal');
+
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'battle-result-modal';
+                modal.className = 'modal battle-result-modal';
+
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+
+                // Create modal header
+                const modalHeader = document.createElement('div');
+                modalHeader.className = 'modal-header';
+
+                const modalTitle = document.createElement('h3');
+                modalTitle.className = 'modal-title';
+                modalTitle.textContent = 'Battle Results';
+
+                const closeButton = document.createElement('button');
+                closeButton.className = 'modal-close';
+                closeButton.innerHTML = '&times;';
+                closeButton.onclick = function() {
+                    modal.classList.remove('show');
+                };
+
+                modalHeader.appendChild(modalTitle);
+                modalHeader.appendChild(closeButton);
+
+                // Create modal body
+                const modalBody = document.createElement('div');
+                modalBody.className = 'modal-body';
+                modalBody.id = 'battle-result-content';
+
+                // Create modal footer
+                const modalFooter = document.createElement('div');
+                modalFooter.className = 'modal-footer';
+
+                const newBattleButton = document.createElement('button');
+                newBattleButton.className = 'btn btn-primary';
+                newBattleButton.innerHTML = '<i class="fas fa-gamepad"></i> New Battle';
+                newBattleButton.onclick = function() {
+                    window.location.href = '/battle';
+                };
+
+                const homeButton = document.createElement('button');
+                homeButton.className = 'btn btn-secondary';
+                homeButton.innerHTML = '<i class="fas fa-home"></i> Home';
+                homeButton.onclick = function() {
+                    window.location.href = '/';
+                };
+
+                modalFooter.appendChild(newBattleButton);
+                modalFooter.appendChild(homeButton);
+
+                // Assemble modal
+                modalContent.appendChild(modalHeader);
+                modalContent.appendChild(modalBody);
+                modalContent.appendChild(modalFooter);
+
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+            }
+
+            // Update modal content based on battle result
+            const modalBody = document.getElementById('battle-result-content');
+
+            // Result header
+            const resultHeader = document.createElement('div');
+            resultHeader.className = 'result-header';
+
+            const resultIcon = document.createElement('div');
+            resultIcon.className = 'result-icon ' + (stats.result === 'win' ? 'win' : 'loss');
+            resultIcon.innerHTML = stats.result === 'win'
+                ? '<i class="fas fa-trophy"></i>'
+                : '<i class="fas fa-times-circle"></i>';
+
+            const resultTitle = document.createElement('div');
+            resultTitle.className = 'result-title';
+            resultTitle.textContent = stats.result === 'win' ? 'Victory!' : 'Defeat';
+
+            const resultSubtitle = document.createElement('div');
+            resultSubtitle.className = 'result-subtitle';
+            resultSubtitle.textContent = stats.message;
+
+            resultHeader.appendChild(resultIcon);
+            resultHeader.appendChild(resultTitle);
+            resultHeader.appendChild(resultSubtitle);
+
+            // Battle stats grid
+            const statsGrid = document.createElement('div');
+            statsGrid.className = 'battle-stats-grid';
+
+            // Time taken
+            const timeCard = document.createElement('div');
+            timeCard.className = 'battle-stat-card';
+
+            const timeValue = document.createElement('div');
+            timeValue.className = 'stat-card-value';
+            timeValue.textContent = stats.stats.time || '00:00';
+
+            const timeLabel = document.createElement('div');
+            timeLabel.className = 'stat-card-label';
+            timeLabel.textContent = 'Time Taken';
+
+            timeCard.appendChild(timeValue);
+            timeCard.appendChild(timeLabel);
+
+            // Keystrokes
+            const keystrokesCard = document.createElement('div');
+            keystrokesCard.className = 'battle-stat-card';
+
+            const keystrokesValue = document.createElement('div');
+            keystrokesValue.className = 'stat-card-value';
+            keystrokesValue.textContent = stats.stats.keystrokes || '0';
+
+            const keystrokesLabel = document.createElement('div');
+            keystrokesLabel.className = 'stat-card-label';
+            keystrokesLabel.textContent = 'Keystrokes';
+
+            keystrokesCard.appendChild(keystrokesValue);
+            keystrokesCard.appendChild(keystrokesLabel);
+
+            // Rating
+            const ratingCard = document.createElement('div');
+            ratingCard.className = 'battle-stat-card';
+
+            const ratingValue = document.createElement('div');
+            ratingValue.className = 'stat-card-value';
+            ratingValue.textContent = stats.newRating || '1000';
+
+            const ratingLabel = document.createElement('div');
+            ratingLabel.className = 'stat-card-label';
+            ratingLabel.textContent = 'New Rating';
+
+            const ratingChange = document.createElement('div');
+            ratingChange.className = 'rating-change ' + (stats.ratingChange >= 0 ? 'positive' : 'negative');
+            ratingChange.innerHTML = (stats.ratingChange >= 0 ? '+' : '') + stats.ratingChange + ' <i class="fas fa-' + (stats.ratingChange >= 0 ? 'arrow-up' : 'arrow-down') + '"></i>';
+
+            ratingCard.appendChild(ratingValue);
+            ratingCard.appendChild(ratingLabel);
+            ratingCard.appendChild(ratingChange);
+
+            // Accuracy
+            const accuracyCard = document.createElement('div');
+            accuracyCard.className = 'battle-stat-card';
+
+            const accuracyValue = document.createElement('div');
+            accuracyValue.className = 'stat-card-value';
+            accuracyValue.textContent = (stats.stats.accuracy || '0') + '%';
+
+            const accuracyLabel = document.createElement('div');
+            accuracyLabel.className = 'stat-card-label';
+            accuracyLabel.textContent = 'Accuracy';
+
+            accuracyCard.appendChild(accuracyValue);
+            accuracyCard.appendChild(accuracyLabel);
+
+            // Add all cards to grid
+            statsGrid.appendChild(timeCard);
+            statsGrid.appendChild(keystrokesCard);
+            statsGrid.appendChild(ratingCard);
+            statsGrid.appendChild(accuracyCard);
+
+            // Clear previous content and add new content
+            modalBody.innerHTML = '';
+            modalBody.appendChild(resultHeader);
+            modalBody.appendChild(statsGrid);
+
+            // Show modal
+            modal.classList.add('show');
+        },
+
+        /**
+         * Update opponent progress
+         * @param {number} progress Progress percentage (0-100)
+         */
+        updateOpponentProgress: function(progress) {
+            // Update state
+            this.state.opponentProgress = progress;
+
+            // Update progress bar
+            const progressBar = document.querySelector('.opponent-progress');
+            if (progressBar) {
+                progressBar.style.width = `${Math.min(this.state.opponentProgress, 100)}%`;
+            }
+        },
+
+        /**
+         * Append text to terminal
+         * @param {string} text Text to append
+         */
+        appendToTerminal: function(text) {
+            const terminal = document.getElementById('terminal-output');
+            if (terminal) {
+                terminal.innerHTML += text + '\n';
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        },
+
+        /**
+         * Handle visibility change (tab switching)
+         */
+        handleVisibilityChange: function() {
+            if (document.hidden && this.state.inProgress) {
+                // User switched tabs during battle
+                this.state.warnings++;
+
+                // Show warning modal
+                const warningModal = document.getElementById('warning-modal');
+                if (warningModal) {
+                    const warningCount = document.getElementById('warning-count');
+                    if (warningCount) {
+                        warningCount.textContent = `Warnings: ${this.state.warnings}/3`;
+                    }
+
+                    warningModal.classList.add('show');
+                }
+
+                // If too many warnings, end battle
+                if (this.state.warnings >= 3) {
+                    this.endBattle('disqualified');
+                }
+            }
+        },
+
+        /**
+         * End battle
+         * @param {string} reason Reason for ending ('user-win', 'opponent-win', 'timeout', 'disqualified')
+         */
+        endBattle: function(reason) {
+            // Stop battle
+            this.state.inProgress = false;
+
+            // Clear timer
+            if (this.state.timer) {
+                clearInterval(this.state.timer);
+            }
+
+            // Show result based on reason
+            switch (reason) {
+                case 'user-win':
+                    alert('Congratulations! You won the battle!');
+                    break;
+                case 'opponent-win':
+                    alert('Your opponent has completed all test cases. You lost the battle.');
+                    break;
+                case 'timeout':
+                    alert('Time\'s up! The battle has ended.');
+                    break;
+                case 'disqualified':
+                    alert('You have been disqualified for switching tabs too many times.');
+                    break;
+            }
+
+            // Redirect to results page (in a real app)
+            // window.location.href = '/results?battle=123';
+        }
+    };
+
+    // Initialize battle when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Socket.IO
+        SocketManager.init();
+
+        // Initialize Battle
+        Battle.init();
+
+        // Check for battle ID in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const battleId = urlParams.get('id');
+
+        if (battleId) {
+            // Join private battle
+            SocketManager.joinPrivateBattle(battleId);
+        }
+    });
+  </script>
+{% endblock %}
+

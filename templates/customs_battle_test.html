@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customs Battle Connection Test</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    h1 {
+      color: #333;
+    }
+    
+    .test-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    .test-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .test-result {
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+    
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    button {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      background-color: #0069d9;
+    }
+    
+    #log {
+      height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-top: 20px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Customs Battle Connection Test</h1>
+  
+  <div class="test-section">
+    <div class="test-title">Socket.IO Connection Test</div>
+    <button id="connect-btn">Connect to Socket.IO Server</button>
+    <div id="connection-result" class="test-result pending">Not tested yet</div>
+  </div>
+  
+  <div class="test-section">
+    <div class="test-title">Create Private Battle Test</div>
+    <button id="create-battle-btn" disabled>Create Private Battle</button>
+    <div id="create-battle-result" class="test-result pending">Not tested yet</div>
+  </div>
+  
+  <div class="test-section">
+    <div class="test-title">Join Private Battle Test</div>
+    <input type="text" id="battle-code" placeholder="Enter battle code">
+    <button id="join-battle-btn" disabled>Join Private Battle</button>
+    <div id="join-battle-result" class="test-result pending">Not tested yet</div>
+  </div>
+  
+  <div class="test-section">
+    <div class="test-title">Send Chat Message Test</div>
+    <input type="text" id="battle-id" placeholder="Enter battle ID">
+    <input type="text" id="chat-message" placeholder="Enter message">
+    <button id="send-message-btn" disabled>Send Message</button>
+    <div id="send-message-result" class="test-result pending">Not tested yet</div>
+  </div>
+  
+  <h2>Event Log</h2>
+  <div id="log"></div>
+  
+  <script>
+    // DOM elements
+    const connectBtn = document.getElementById('connect-btn');
+    const createBattleBtn = document.getElementById('create-battle-btn');
+    const joinBattleBtn = document.getElementById('join-battle-btn');
+    const sendMessageBtn = document.getElementById('send-message-btn');
+    
+    const connectionResult = document.getElementById('connection-result');
+    const createBattleResult = document.getElementById('create-battle-result');
+    const joinBattleResult = document.getElementById('join-battle-result');
+    const sendMessageResult = document.getElementById('send-message-result');
+    
+    const battleCodeInput = document.getElementById('battle-code');
+    const battleIdInput = document.getElementById('battle-id');
+    const chatMessageInput = document.getElementById('chat-message');
+    
+    const logElement = document.getElementById('log');
+    
+    // Socket.IO instance
+    let socket = null;
+    
+    // Log function
+    function log(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = document.createElement('div');
+      logEntry.textContent = `[${timestamp}] ${message}`;
+      
+      if (type === 'error') {
+        logEntry.style.color = '#dc3545';
+      } else if (type === 'success') {
+        logEntry.style.color = '#28a745';
+      } else if (type === 'warning') {
+        logEntry.style.color = '#ffc107';
+      }
+      
+      logElement.appendChild(logEntry);
+      logElement.scrollTop = logElement.scrollHeight;
+    }
+    
+    // Connect to Socket.IO server
+    connectBtn.addEventListener('click', function() {
+      connectionResult.textContent = 'Connecting...';
+      connectionResult.className = 'test-result pending';
+      
+      try {
+        // Get the server URL from the current page
+        const serverUrl = window.location.protocol + '//' + window.location.host;
+        log(`Connecting to Socket.IO server at ${serverUrl}...`);
+        
+        // Initialize Socket.IO connection
+        socket = io(serverUrl, {
+          transports: ['websocket', 'polling'],
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000
+        });
+        
+        // Connection events
+        socket.on('connect', function() {
+          log('Connected to Socket.IO server!', 'success');
+          connectionResult.textContent = 'Connected successfully!';
+          connectionResult.className = 'test-result success';
+          
+          // Enable other buttons
+          createBattleBtn.disabled = false;
+          joinBattleBtn.disabled = false;
+          sendMessageBtn.disabled = false;
+        });
+        
+        socket.on('disconnect', function() {
+          log('Disconnected from Socket.IO server', 'warning');
+          connectionResult.textContent = 'Disconnected from server';
+          connectionResult.className = 'test-result error';
+          
+          // Disable other buttons
+          createBattleBtn.disabled = true;
+          joinBattleBtn.disabled = true;
+          sendMessageBtn.disabled = true;
+        });
+        
+        socket.on('connect_error', function(error) {
+          log(`Connection error: ${error.message}`, 'error');
+          connectionResult.textContent = `Connection error: ${error.message}`;
+          connectionResult.className = 'test-result error';
+        });
+        
+        // Custom events
+        socket.on('customs_private_battle_created', function(data) {
+          log(`Private battle created! Battle ID: ${data.battle_id}, Code: ${data.battle_code}`, 'success');
+          createBattleResult.textContent = `Battle created! Code: ${data.battle_code}`;
+          createBattleResult.className = 'test-result success';
+          
+          // Auto-fill battle code input
+          battleCodeInput.value = data.battle_code;
+          
+          // Auto-fill battle ID input
+          battleIdInput.value = data.battle_id;
+        });
+        
+        socket.on('customs_private_battle_joined', function(data) {
+          log(`Joined private battle! Battle ID: ${data.battle_id}, Opponent: ${data.opponent.username}`, 'success');
+          joinBattleResult.textContent = `Joined battle with ${data.opponent.username}!`;
+          joinBattleResult.className = 'test-result success';
+          
+          // Auto-fill battle ID input
+          battleIdInput.value = data.battle_id;
+        });
+        
+        socket.on('customs_battle_update', function(data) {
+          log(`Battle update received: ${JSON.stringify(data)}`, 'info');
+          
+          if (data.type === 'chat_message') {
+            sendMessageResult.textContent = 'Message received!';
+            sendMessageResult.className = 'test-result success';
+          }
+        });
+        
+        socket.on('customs_error', function(data) {
+          log(`Error from server: ${data.message}`, 'error');
+        });
+        
+      } catch (error) {
+        log(`Failed to initialize Socket.IO: ${error.message}`, 'error');
+        connectionResult.textContent = `Failed to connect: ${error.message}`;
+        connectionResult.className = 'test-result error';
+      }
+    });
+    
+    // Create private battle
+    createBattleBtn.addEventListener('click', function() {
+      if (!socket) {
+        log('Socket not connected', 'error');
+        return;
+      }
+      
+      createBattleResult.textContent = 'Creating battle...';
+      createBattleResult.className = 'test-result pending';
+      
+      log('Creating private battle...');
+      
+      // Emit create private battle event
+      socket.emit('customs_create_private_battle', {
+        username: 'Test User 1',
+        rating: 1200
+      });
+    });
+    
+    // Join private battle
+    joinBattleBtn.addEventListener('click', function() {
+      if (!socket) {
+        log('Socket not connected', 'error');
+        return;
+      }
+      
+      const battleCode = battleCodeInput.value.trim();
+      if (!battleCode) {
+        log('Please enter a battle code', 'error');
+        return;
+      }
+      
+      joinBattleResult.textContent = 'Joining battle...';
+      joinBattleResult.className = 'test-result pending';
+      
+      log(`Joining private battle with code: ${battleCode}...`);
+      
+      // Emit join private battle event
+      socket.emit('customs_join_private_battle', {
+        battle_code: battleCode,
+        username: 'Test User 2',
+        rating: 1100
+      });
+    });
+    
+    // Send chat message
+    sendMessageBtn.addEventListener('click', function() {
+      if (!socket) {
+        log('Socket not connected', 'error');
+        return;
+      }
+      
+      const battleId = battleIdInput.value.trim();
+      if (!battleId) {
+        log('Please enter a battle ID', 'error');
+        return;
+      }
+      
+      const message = chatMessageInput.value.trim();
+      if (!message) {
+        log('Please enter a message', 'error');
+        return;
+      }
+      
+      sendMessageResult.textContent = 'Sending message...';
+      sendMessageResult.className = 'test-result pending';
+      
+      log(`Sending message to battle ${battleId}: ${message}`);
+      
+      // Emit chat message event
+      socket.emit('customs_battle_action', {
+        battle_id: battleId,
+        action_type: 'chat_message',
+        message: {
+          text: message,
+          sender: 'Test User',
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+      // Clear message input
+      chatMessageInput.value = '';
+    });
+  </script>
+</body>
+</html>

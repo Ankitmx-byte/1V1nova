@@ -1,0 +1,447 @@
+{% extends 'base.html' %}
+
+{% block title %}CodeBattle - Help Center{% endblock %}
+
+{% block styles %}
+<style>
+    .help-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+    
+    .page-header p {
+        color: var(--text-secondary);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .help-search {
+        max-width: 700px;
+        margin: 0 auto 3rem;
+        position: relative;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        padding-left: 3rem;
+        background-color: var(--bg-light);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--border-radius);
+        color: var(--text-primary);
+        font-size: 1rem;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+    }
+    
+    .help-layout {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 2rem;
+    }
+    
+    .help-sidebar {
+        background-color: var(--bg-light);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
+        height: fit-content;
+    }
+    
+    .sidebar-title {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+    
+    .sidebar-item:hover, .sidebar-item.active {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+    }
+    
+    .sidebar-item.active {
+        background-color: rgba(74, 105, 189, 0.1);
+        color: var(--primary);
+        font-weight: 500;
+    }
+    
+    .help-content {
+        background-color: var(--bg-light);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .help-section {
+        margin-bottom: 3rem;
+    }
+    
+    .help-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+    }
+    
+    .faq-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .faq-item {
+        background-color: var(--bg-lighter);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+    
+    .faq-question {
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .faq-question:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .faq-question h3 {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .faq-toggle {
+        color: var(--text-secondary);
+        transition: var(--transition);
+    }
+    
+    .faq-answer {
+        padding: 0 1.5rem 1.25rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+    
+    .faq-item.active .faq-question {
+        background-color: rgba(74, 105, 189, 0.1);
+    }
+    
+    .faq-item.active .faq-toggle {
+        transform: rotate(180deg);
+    }
+    
+    .contact-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .contact-card {
+        background-color: var(--bg-lighter);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        transition: var(--transition);
+    }
+    
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .contact-icon {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+    
+    .contact-title {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+    }
+    
+    .contact-description {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--box-shadow);
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid var(--text-secondary);
+        color: var(--text-primary);
+    }
+    
+    .btn-outline:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    
+    @media (max-width: 768px) {
+        .help-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="help-container">
+    <div class="page-header">
+        <h1>Help Center</h1>
+        <p>Find answers to common questions and get support for CodeBattle.</p>
+    </div>
+    
+    <div class="help-search">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search for help...">
+    </div>
+    
+    <div class="help-layout">
+        <div class="help-sidebar">
+            <h2 class="sidebar-title">Help Categories</h2>
+            <div class="sidebar-menu">
+                <a href="#getting-started" class="sidebar-item active">
+                    <i class="fas fa-rocket"></i>
+                    <span>Getting Started</span>
+                </a>
+                <a href="#account" class="sidebar-item">
+                    <i class="fas fa-user"></i>
+                    <span>Account & Profile</span>
+                </a>
+                <a href="#challenges" class="sidebar-item">
+                    <i class="fas fa-code"></i>
+                    <span>Challenges</span>
+                </a>
+                <a href="#battles" class="sidebar-item">
+                    <i class="fas fa-gamepad"></i>
+                    <span>Battles</span>
+                </a>
+                <a href="#leaderboard" class="sidebar-item">
+                    <i class="fas fa-trophy"></i>
+                    <span>Leaderboard</span>
+                </a>
+                <a href="#payments" class="sidebar-item">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Payments</span>
+                </a>
+                <a href="#technical" class="sidebar-item">
+                    <i class="fas fa-wrench"></i>
+                    <span>Technical Issues</span>
+                </a>
+                <a href="#contact" class="sidebar-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact Us</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="help-content">
+            <div id="getting-started" class="help-section">
+                <h2 class="section-title">Getting Started</h2>
+                <div class="faq-list">
+                    <div class="faq-item active">
+                        <div class="faq-question">
+                            <h3>What is CodeBattle?</h3>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>CodeBattle is a platform where programmers can improve their coding skills by solving challenges, competing in real-time battles, and learning from comprehensive tutorials and courses. Our platform is designed to help coders of all levels enhance their problem-solving abilities and prepare for technical interviews.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>How do I create an account?</h3>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer" style="display: none;">
+                            <p>To create an account, click on the "Sign Up" button in the top right corner of the homepage. You can sign up using your email address, or through Google, GitHub, or Facebook authentication. After signing up, you'll need to verify your email address to activate your account.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Is CodeBattle free to use?</h3>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer" style="display: none;">
+                            <p>CodeBattle offers both free and premium features. The free tier gives you access to a limited number of challenges, battles, and learning resources. Premium membership unlocks all challenges, advanced analytics, premium courses, and more. You can view our pricing plans on the Pricing page.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>What programming languages are supported?</h3>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer" style="display: none;">
+                            <p>CodeBattle currently supports JavaScript, Python, Java, C++, C#, Ruby, Go, Swift, Kotlin, and TypeScript. We're constantly adding support for more languages based on user feedback and demand.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="contact" class="help-section">
+                <h2 class="section-title">Contact Us</h2>
+                <p>Can't find what you're looking for? Get in touch with our support team.</p>
+                
+                <div class="contact-options">
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3 class="contact-title">Email Support</h3>
+                        <p class="contact-description">Send us an email and we'll get back to you within 24 hours.</p>
+                        <a href="mailto:support@codebattle.com" class="btn btn-primary">
+                            <i class="fas fa-envelope"></i> Email Us
+                        </a>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3 class="contact-title">Live Chat</h3>
+                        <p class="contact-description">Chat with our support team in real-time during business hours.</p>
+                        <a href="#" class="btn btn-primary">
+                            <i class="fas fa-comment"></i> Start Chat
+                        </a>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3 class="contact-title">Knowledge Base</h3>
+                        <p class="contact-description">Browse our extensive documentation and tutorials.</p>
+                        <a href="#" class="btn btn-primary">
+                            <i class="fas fa-book-open"></i> View Docs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // FAQ toggle functionality
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const faqItem = question.parentElement;
+                const answer = question.nextElementSibling;
+                
+                // Toggle active class
+                faqItem.classList.toggle('active');
+                
+                // Toggle answer visibility
+                if (faqItem.classList.contains('active')) {
+                    answer.style.display = 'block';
+                } else {
+                    answer.style.display = 'none';
+                }
+            });
+        });
+        
+        // Sidebar navigation
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                // Remove active class from all items
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Scroll to the section (smooth scroll)
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                
+                if (targetSection) {
+                    e.preventDefault();
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

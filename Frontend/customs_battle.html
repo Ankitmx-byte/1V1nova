@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeBattle - Customs Battle Arena</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="auth.js"></script>
+  <script src="customs_battle_chat.js"></script>
+  <script src="customs_battle.js"></script>
+  <style>
+    /* Global Styles */
+    :root {
+      --bg-primary: #121212;
+      --bg-secondary: #1e1e1e;
+      --bg-tertiary: #252525;
+      --text-primary: #ffffff;
+      --text-secondary: #b3b3b3;
+      --accent-primary: #9b59b6; /* Purple for customs */
+      --accent-secondary: #8e44ad;
+      --success: #43b581;
+      --warning: #faa61a;
+      --error: #f04747;
+      --border-radius: 8px;
+      --transition: all 0.3s ease;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dark-theme {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: var(--bg-secondary);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-primary);
+    }
+
+    .nav-links .active {
+      color: var(--accent-primary);
+    }
+
+    /* Customs Battle Arena Styles */
+    .customs-battle-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    .customs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background-color: var(--bg-secondary);
+      border-radius: var(--border-radius);
+      border-left: 4px solid var(--accent-primary);
+    }
+
+    .customs-title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .customs-title i {
+      font-size: 1.5rem;
+      color: var(--accent-primary);
+    }
+
+    .customs-title h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .customs-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Battle Interface Styles */
+    .battle-interface {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background-color: var(--bg-secondary);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      box-shadow: var(--box-shadow);
+    }
+
+    .battle-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .battle-id {
+      font-family: monospace;
+      background-color: var(--bg-tertiary);
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .battle-timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--warning);
+    }
+
+    .opponent-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .opponent-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: var(--bg-tertiary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+    }
+
+    .opponent-details h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .opponent-rating {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Battle Content */
+    .battle-content {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      gap: 1.5rem;
+      flex: 1;
+    }
+
+    .problem-description {
+      background-color: var(--bg-tertiary);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      overflow-y: auto;
+    }
+
+    .problem-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .problem-title h3 {
+      margin: 0;
+    }
+
+    .difficulty {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .difficulty.easy {
+      background-color: rgba(67, 181, 129, 0.2);
+      color: var(--success);
+    }
+
+    .difficulty.medium {
+      background-color: rgba(250, 166, 26, 0.2);
+      color: var(--warning);
+    }
+
+    .difficulty.hard {
+      background-color: rgba(240, 71, 71, 0.2);
+      color: var(--error);
+    }
+
+    .problem-content {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .problem-content p {
+      margin-bottom: 1rem;
+    }
+
+    .problem-content code {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+
+    .example {
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: var(--border-radius);
+    }
+
+    .example pre {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: monospace;
+    }
+
+    /* Code Editor */
+    .code-editor-container {
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-tertiary);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    }
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .editor-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .language-select {
+      padding: 0.5rem;
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--border-radius);
+    }
+
+    .copy-paste-disabled {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--error);
+      font-size: 0.85rem;
+      font-weight: 500;
+      background-color: rgba(240, 71, 71, 0.1);
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(240, 71, 71, 0.3);
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .editor-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .run-btn {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .submit-btn {
+      background-color: var(--accent-primary);
+      color: white;
+    }
+
+    .code-editor {
+      flex: 1;
+      min-height: 400px;
+    }
+
+    .terminal {
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      font-family: monospace;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .terminal-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Battle Progress */
+    .battle-progress {
+      background-color: var(--bg-tertiary);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Webcam Styles */
+    .webcam-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .webcam-container h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .webcam-container h3::before {
+      content: '';
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--error);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(240, 71, 71, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 6px rgba(240, 71, 71, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(240, 71, 71, 0);
+      }
+    }
+
+    .webcam-feeds {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .webcam-feed {
+      flex: 1;
+      height: 150px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      position: relative;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .webcam-label {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: var(--text-primary);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      z-index: 3;
+    }
+
+    .webcam-placeholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 2;
+    }
+
+    .webcam-placeholder i {
+      font-size: 2rem;
+      color: var(--error);
+    }
+
+    .enable-webcam-btn {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: var(--accent-primary);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .enable-webcam-btn:hover {
+      background-color: var(--accent-secondary);
+    }
+
+    #webcam-video, #opponent-webcam-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .webcam-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--error);
+      padding: 0.5rem;
+      background-color: rgba(240, 71, 71, 0.1);
+      border-radius: var(--border-radius);
+      border: 1px solid rgba(240, 71, 71, 0.3);
+    }
+
+    .webcam-status.active {
+      color: var(--success);
+      background-color: rgba(67, 181, 129, 0.1);
+      border: 1px solid rgba(67, 181, 129, 0.3);
+    }
+
+    .webcam-status.both-active::after {
+      content: " | Both cameras connected";
+      color: var(--success);
+    }
+
+    /* Cheating Warning Styles */
+    .cheating-warning {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(240, 71, 71, 0.9);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+      max-width: 80%;
+      text-align: center;
+    }
+
+    @keyframes shake {
+      10%, 90% { transform: translateX(-51%); }
+      20%, 80% { transform: translateX(-49%); }
+      30%, 50%, 70% { transform: translateX(-52%); }
+      40%, 60% { transform: translateX(-48%); }
+    }
+
+    .cheating-warning.fade-out {
+      animation: fadeOut 1s forwards;
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    .progress-section h3 {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: var(--accent-primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .test-cases {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .test-case {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: var(--border-radius);
+      border-left: 3px solid var(--text-secondary);
+    }
+
+    .test-case.passed {
+      border-left-color: var(--success);
+    }
+
+    .test-case.failed {
+      border-left-color: var(--error);
+    }
+
+    .test-case.running {
+      border-left-color: var(--warning);
+    }
+
+    .test-status {
+      font-size: 1.1rem;
+    }
+
+    .test-case.passed .test-status {
+      color: var(--success);
+    }
+
+    .test-case.failed .test-status {
+      color: var(--error);
+    }
+
+    .test-case.running .test-status {
+      color: var(--warning);
+    }
+
+    /* Real-time Features */
+    .real-time-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .real-time-indicator .status {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+    }
+
+    .typing-indicator {
+      font-style: italic;
+      color: var(--accent-primary);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      height: 1.2rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .battle-content {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .problem-description {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .battle-content {
+        grid-template-columns: 1fr;
+      }
+
+      .problem-description {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body class="dark-theme">
+  <nav class="navbar">
+    <div class="logo">
+      <i class="fas fa-crown"></i>
+      <h1>CodeBattle</h1>
+    </div>
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="battle.html">Battle Arena</a>
+      <a href="customs_battle.html" class="active">Customs</a>
+      <a href="user.html">Profile</a>
+      <a href="login.html">Logout</a>
+    </div>
+  </nav>
+
+  <div class="customs-battle-container">
+    <div class="customs-header">
+      <div class="customs-title">
+        <i class="fas fa-crown"></i>
+        <div>
+          <h2>Customs Battle Arena</h2>
+          <div class="customs-subtitle">Enhanced competitive coding battles with real-time features</div>
+        </div>
+      </div>
+      <button class="back-button" onclick="window.location.href='battle.html'">
+        <i class="fas fa-arrow-left"></i> Back to Battle Arena
+      </button>
+    </div>
+
+    <div class="battle-interface">
+      <div class="battle-info">
+        <div class="opponent-info">
+          <div class="opponent-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="opponent-details">
+            <h3 id="opponent-name">John Smith</h3>
+            <div class="opponent-rating">Rating: <span id="opponent-rating">1200</span></div>
+          </div>
+        </div>
+
+        <div class="battle-timer" id="battle-timer">30:00</div>
+
+        <div class="battle-id">
+          Battle ID: <span id="battle-id">21a24e1c-5226-43b9-9fd2-384765513fa7</span>
+        </div>
+      </div>
+
+      <div class="battle-content">
+        <div class="problem-description">
+          <div class="problem-title">
+            <h3>Two Sum</h3>
+            <span class="difficulty easy">Easy</span>
+          </div>
+
+          <div class="problem-content">
+            <p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to target.</p>
+            <p>You may assume that each input would have exactly one solution, and you may not use the same element twice.</p>
+            <p>You can return the answer in any order.</p>
+
+            <div class="example">
+              <p><strong>Example 1:</strong></p>
+              <pre>Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].</pre>
+            </div>
+
+            <div class="example">
+              <p><strong>Example 2:</strong></p>
+              <pre>Input: nums = [3,2,4], target = 6
+Output: [1,2]</pre>
+            </div>
+
+            <div class="example">
+              <p><strong>Example 3:</strong></p>
+              <pre>Input: nums = [3,3], target = 6
+Output: [0,1]</pre>
+            </div>
+
+            <div class="constraints">
+              <p><strong>Constraints:</strong></p>
+              <ul>
+                <li>2 ≤ nums.length ≤ 10<sup>4</sup></li>
+                <li>-10<sup>9</sup> ≤ nums[i] ≤ 10<sup>9</sup></li>
+                <li>-10<sup>9</sup> ≤ target ≤ 10<sup>9</sup></li>
+                <li>Only one valid answer exists.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-editor-container">
+          <div class="editor-header">
+            <div class="editor-left">
+              <select class="language-select" id="language-select">
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+              </select>
+              <div class="copy-paste-disabled">
+                <i class="fas fa-ban"></i> Copy/Paste Disabled
+              </div>
+            </div>
+
+            <div class="editor-actions">
+              <button class="editor-btn run-btn" id="run-btn">
+                <i class="fas fa-play"></i> Run
+              </button>
+              <button class="editor-btn submit-btn" id="submit-btn">
+                <i class="fas fa-check"></i> Submit
+              </button>
+            </div>
+          </div>
+
+          <div class="code-editor" id="code-editor"></div>
+
+          <div class="terminal">
+            <div class="terminal-header">
+              <span>Terminal</span>
+              <span id="execution-time"></span>
+            </div>
+            <div id="terminal-output">> Ready to code...</div>
+          </div>
+
+          <div class="real-time-indicator">
+            <div class="status"></div>
+            <span>Real-time connection active</span>
+          </div>
+
+          <div class="typing-indicator" id="typing-indicator"></div>
+        </div>
+
+        <div class="battle-progress">
+          <div class="webcam-container">
+            <h3>Anti-Cheat Monitoring</h3>
+            <div class="webcam-feeds">
+              <div class="webcam-feed" id="webcam-feed">
+                <div class="webcam-label">You</div>
+                <div class="webcam-placeholder" id="webcam-placeholder">
+                  <i class="fas fa-video"></i>
+                  <span>Camera access required</span>
+                  <button id="enable-webcam-btn" class="enable-webcam-btn">Enable Camera</button>
+                </div>
+                <video id="webcam-video" autoplay playsinline muted></video>
+              </div>
+              <div class="webcam-feed" id="opponent-webcam-feed">
+                <div class="webcam-label">Opponent</div>
+                <div class="webcam-placeholder" id="opponent-webcam-placeholder">
+                  <i class="fas fa-video"></i>
+                  <span>Waiting for opponent's camera</span>
+                </div>
+                <video id="opponent-webcam-video" autoplay playsinline muted></video>
+              </div>
+            </div>
+            <div class="webcam-status" id="webcam-status">
+              <i class="fas fa-exclamation-triangle"></i> Camera access is required to participate in battles
+            </div>
+          </div>
+
+          <div class="progress-section">
+            <h3>Your Progress</h3>
+            <div class="progress-bar">
+              <div class="progress" id="your-progress" style="width: 0%"></div>
+            </div>
+
+            <div class="test-cases">
+              <div class="test-case" id="your-test-1">
+                <span class="test-number">Test Case #1</span>
+                <span class="test-status">○</span>
+              </div>
+              <div class="test-case" id="your-test-2">
+                <span class="test-number">Test Case #2</span>
+                <span class="test-status">○</span>
+              </div>
+              <div class="test-case" id="your-test-3">
+                <span class="test-number">Test Case #3</span>
+                <span class="test-status">○</span>
+              </div>
+              <div class="test-case" id="your-test-4">
+                <span class="test-number">Test Case #4</span>
+                <span class="test-status">○</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-section">
+            <h3>Opponent's Progress</h3>
+            <div class="progress-bar">
+              <div class="progress" id="opponent-progress" style="width: 0%"></div>
+            </div>
+
+            <div class="test-cases">
+              <div class="test-case" id="opponent-test-1">
+                <span class="test-number">Test Case #1</span>
+                <span class="test-status">○</span>
+              </div>
+              <div class="test-case" id="opponent-test-2">
+                <span class="test-number">Test Case #2</span>
+                <span class="test-status">○</span>
+              </div>
+              <div class="test-case" id="opponent-test-3">
+                <span class="test-number">Test Case #3</span>
+                <span class="test-status">○</span>
+              </div>
+              <div class="test-case" id="opponent-test-4">
+                <span class="test-number">Test Case #4</span>
+                <span class="test-status">○</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // This script will be replaced by the customs_battle.js file
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize the code editor
+      const editor = ace.edit("code-editor");
+      editor.setTheme("ace/theme/monokai");
+      editor.session.setMode("ace/mode/python");
+      editor.setValue(`def two_sum(nums, target):
+    # Your solution here
+    pass`);
+
+      // Disable copy and paste functionality
+      editor.commands.removeCommand('copy');
+      editor.commands.removeCommand('cut');
+      editor.commands.removeCommand('paste');
+
+      // Add custom message for copy/paste attempts
+      editor.commands.addCommand({
+        name: "copy",
+        bindKey: {win: "Ctrl-C", mac: "Command-C"},
+        exec: function() {
+          const terminalOutput = document.getElementById('terminal-output');
+          terminalOutput.textContent += "> Copy functionality is disabled in this battle.\n";
+        }
+      });
+
+      editor.commands.addCommand({
+        name: "cut",
+        bindKey: {win: "Ctrl-X", mac: "Command-X"},
+        exec: function() {
+          const terminalOutput = document.getElementById('terminal-output');
+          terminalOutput.textContent += "> Cut functionality is disabled in this battle.\n";
+        }
+      });
+
+      editor.commands.addCommand({
+        name: "paste",
+        bindKey: {win: "Ctrl-V", mac: "Command-V"},
+        exec: function() {
+          const terminalOutput = document.getElementById('terminal-output');
+          terminalOutput.textContent += "> Paste functionality is disabled in this battle.\n";
+        }
+      });
+
+      // Set battle ID and opponent name from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const battleId = urlParams.get('id') || '21a24e1c-5226-43b9-9fd2-384765513fa7';
+      const opponentName = urlParams.get('opponent') || 'John Smith';
+
+      document.getElementById('battle-id').textContent = battleId;
+      document.getElementById('opponent-name').textContent = opponentName;
+
+      // Initialize webcam for anti-cheat monitoring
+      const webcamVideo = document.getElementById('webcam-video');
+      const webcamPlaceholder = document.getElementById('webcam-placeholder');
+      const webcamStatus = document.getElementById('webcam-status');
+      const enableWebcamBtn = document.getElementById('enable-webcam-btn');
+      const runBtn = document.getElementById('run-btn');
+      const submitBtn = document.getElementById('submit-btn');
+
+      // Disable run and submit buttons until webcam is enabled
+      runBtn.disabled = true;
+      submitBtn.disabled = true;
+
+      // Function to initialize webcam
+      async function initializeWebcam() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 320 },
+              height: { ideal: 240 },
+              facingMode: 'user'
+            }
+          });
+
+          webcamVideo.srcObject = stream;
+          webcamPlaceholder.style.display = 'none';
+
+          // Update status
+          webcamStatus.innerHTML = '<i class="fas fa-check-circle"></i> Camera active - Anti-cheat monitoring enabled';
+          webcamStatus.className = 'webcam-status active';
+
+          // Enable run and submit buttons
+          runBtn.disabled = false;
+          submitBtn.disabled = false;
+
+          // Start periodic screenshots for anti-cheat monitoring
+          startAntiCheatMonitoring();
+
+          // Update terminal
+          const terminalOutput = document.getElementById('terminal-output');
+          terminalOutput.textContent += "> Anti-cheat monitoring enabled. You can now participate in the battle.\n";
+
+          return true;
+        } catch (error) {
+          console.error('Error accessing webcam:', error);
+
+          // Update status with error message
+          webcamStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Camera access denied: ${error.message}`;
+
+          // Update terminal
+          const terminalOutput = document.getElementById('terminal-output');
+          terminalOutput.textContent += "> Error: Camera access is required to participate in battles.\n";
+
+          return false;
+        }
+      }
+
+      // Function to start anti-cheat monitoring
+      function startAntiCheatMonitoring() {
+        // Create a canvas element for capturing screenshots
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = 320;
+        canvas.height = 240;
+
+        // Take screenshots periodically
+        setInterval(() => {
+          if (webcamVideo.srcObject) {
+            // Draw the current video frame to the canvas
+            context.drawImage(webcamVideo, 0, 0, canvas.width, canvas.height);
+
+            // In a real implementation, you would:
+            // 1. Convert the canvas to a data URL or blob
+            // 2. Send it to the server for analysis or storage
+            // 3. Use AI to detect if the user is looking at other screens or using phones
+
+            // For demo purposes, we'll just log that a screenshot was taken
+            console.log('Anti-cheat screenshot captured at', new Date().toLocaleTimeString());
+          }
+        }, 10000); // Take a screenshot every 10 seconds
+      }
+
+      // Add event listener to the enable webcam button
+      enableWebcamBtn.addEventListener('click', initializeWebcam);
+
+      // Initialize timer
+      let timeRemaining = 30 * 60; // 30 minutes in seconds
+      const timerElement = document.getElementById('battle-timer');
+
+      function updateTimer() {
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        if (timeRemaining > 0) {
+          timeRemaining--;
+          setTimeout(updateTimer, 1000);
+        } else {
+          timerElement.textContent = "Time's up!";
+          timerElement.style.color = "var(--error)";
+        }
+      }
+
+      updateTimer();
+
+      // Run button functionality
+      document.getElementById('run-btn').addEventListener('click', function() {
+        const terminalOutput = document.getElementById('terminal-output');
+        terminalOutput.textContent = "> Running code...\n";
+
+        setTimeout(() => {
+          terminalOutput.textContent += "> Test case 1: Passed\n";
+          document.getElementById('your-test-1').className = "test-case passed";
+          document.getElementById('your-test-1').querySelector('.test-status').textContent = "✓";
+
+          document.getElementById('your-progress').style.width = "25%";
+        }, 500);
+
+        setTimeout(() => {
+          terminalOutput.textContent += "> Test case 2: Passed\n";
+          document.getElementById('your-test-2').className = "test-case passed";
+          document.getElementById('your-test-2').querySelector('.test-status').textContent = "✓";
+
+          document.getElementById('your-progress').style.width = "50%";
+        }, 1000);
+
+        setTimeout(() => {
+          terminalOutput.textContent += "> Test case 3: Failed\n";
+          terminalOutput.textContent += "> Expected: [1, 2], Got: [0, 1]\n";
+          document.getElementById('your-test-3').className = "test-case failed";
+          document.getElementById('your-test-3').querySelector('.test-status').textContent = "✗";
+
+          document.getElementById('your-progress').style.width = "50%";
+        }, 1500);
+
+        setTimeout(() => {
+          terminalOutput.textContent += "> Test case 4: Running...\n";
+          document.getElementById('your-test-4').className = "test-case running";
+          document.getElementById('your-test-4').querySelector('.test-status').textContent = "⟳";
+        }, 2000);
+
+        setTimeout(() => {
+          terminalOutput.textContent += "> Test case 4: Passed\n";
+          document.getElementById('your-test-4').className = "test-case passed";
+          document.getElementById('your-test-4').querySelector('.test-status').textContent = "✓";
+
+          document.getElementById('your-progress').style.width = "75%";
+
+          document.getElementById('execution-time').textContent = "Execution time: 245ms";
+        }, 2500);
+      });
+
+      // Simulate opponent progress
+      setTimeout(() => {
+        document.getElementById('opponent-test-1').className = "test-case passed";
+        document.getElementById('opponent-test-1').querySelector('.test-status').textContent = "✓";
+        document.getElementById('opponent-progress').style.width = "25%";
+
+        document.getElementById('typing-indicator').textContent = "Opponent is typing...";
+      }, 5000);
+
+      setTimeout(() => {
+        document.getElementById('opponent-test-2').className = "test-case passed";
+        document.getElementById('opponent-test-2').querySelector('.test-status').textContent = "✓";
+        document.getElementById('opponent-progress').style.width = "50%";
+
+        document.getElementById('typing-indicator').textContent = "";
+      }, 8000);
+
+      setTimeout(() => {
+        document.getElementById('opponent-test-3').className = "test-case failed";
+        document.getElementById('opponent-test-3').querySelector('.test-status').textContent = "✗";
+        document.getElementById('opponent-progress').style.width = "50%";
+      }, 12000);
+
+      // Language selector functionality
+      document.getElementById('language-select').addEventListener('change', function() {
+        const language = this.value;
+        let mode;
+        let initialCode = "";
+
+        switch(language) {
+          case 'python':
+            mode = "ace/mode/python";
+            initialCode = `def two_sum(nums, target):
+    # Your solution here
+    pass`;
+            break;
+          case 'javascript':
+            mode = "ace/mode/javascript";
+            initialCode = `/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+function twoSum(nums, target) {
+    // Your solution here
+}`;
+            break;
+          case 'java':
+            mode = "ace/mode/java";
+            initialCode = `class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        // Your solution here
+        return new int[]{0, 0};
+    }
+}`;
+            break;
+          case 'cpp':
+            mode = "ace/mode/c_cpp";
+            initialCode = `class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        // Your solution here
+        return {0, 0};
+    }
+};`;
+            break;
+        }
+
+        editor.session.setMode(mode);
+        editor.setValue(initialCode);
+      });
+    });
+  </script>
+</body>
+</html>

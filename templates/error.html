@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Error - {{ error_code }}{% endblock %}
+
+{% block styles %}
+<style>
+    :root {
+        --primary: #4a69bd;
+        --primary-dark: #3c55a5;
+        --primary-light: #5f7de8;
+        --secondary: #6a89cc;
+        --text-primary: #f5f6fa;
+        --text-secondary: #dcdde1;
+        --bg-dark: #2f3640;
+        --bg-light: #353b48;
+        --bg-lighter: #3d4452;
+        --success: #4cd137;
+        --warning: #fbc531;
+        --danger: #e84118;
+        --border-radius: 6px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-primary);
+        line-height: 1.6;
+    }
+    
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background-color: var(--bg-light);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    
+    .brand { 
+        font-size: 1.5rem; 
+        font-weight: bold; 
+        color: var(--primary); 
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .brand i {
+        font-size: 1.8rem;
+    }
+    
+    .nav-links { 
+        display: flex; 
+        gap: 1.5rem; 
+    }
+    
+    .nav-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: var(--transition);
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+    }
+    
+    .nav-links a:hover { 
+        color: var(--text-primary);
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .nav-links a.active { 
+        color: var(--primary); 
+        font-weight: 600; 
+        background-color: rgba(74, 105, 189, 0.1);
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        text-align: center;
+    }
+    
+    .error-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 60vh;
+    }
+    
+    .error-code {
+        font-size: 8rem;
+        font-weight: bold;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        text-shadow: 0 0 10px rgba(74, 105, 189, 0.5);
+    }
+    
+    .error-message {
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--box-shadow);
+        text-decoration: none;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-code">{{ error_code }}</div>
+    <div class="error-message">{{ error_message }}</div>
+    <a href="{{ url_for('home') }}" class="btn btn-primary">
+        <i class="fas fa-home"></i> Go Home
+    </a>
+</div>
+{% endblock %}

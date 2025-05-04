@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeBattle - Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-primary: #6c5ce7;
+            --accent-secondary: #8c7ae6;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+        }
+
+        .left-panel {
+            flex: 1;
+            display: none;
+            background-color: var(--bg-secondary);
+            padding: 3rem;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .brand-icon {
+            color: var(--accent-primary);
+            font-size: 1.75rem;
+        }
+
+        .illustration {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 1.5rem;
+        }
+
+        .illustration-icon {
+            font-size: 8rem;
+            color: var(--accent-primary);
+        }
+
+        .illustration-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+        }
+
+        .illustration-text {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            max-width: 80%;
+        }
+
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .feature-icon {
+            color: var(--accent-primary);
+            font-size: 1.25rem;
+        }
+
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtitle {
+            color: var(--text-secondary);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid #333;
+            border-radius: 0.375rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .submit-button {
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .submit-button:hover {
+            background-color: var(--accent-secondary);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .form-footer a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (min-width: 1024px) {
+            .left-panel {
+                display: flex;
+            }
+        }
+
+        .login-form {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background-color: var(--accent-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel: Brand & Features -->
+        <div class="left-panel">
+            <div class="brand">
+                <i class="fa-solid fa-code brand-icon"></i>
+                <span class="brand-name">CodeBattle</span>
+            </div>
+
+            <div class="illustration">
+                <i class="fa-solid fa-code-compare illustration-icon"></i>
+                <h2 class="illustration-title">Challenge. Code. Conquer.</h2>
+                <p class="illustration-text">One-on-one coding battles to sharpen your skills and outshine your competitors.</p>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <i class="fa-solid fa-bolt feature-icon"></i>
+                    <span>Real-time coding battles</span>
+                </div>
+                <div class="feature">
+                    <i class="fa-solid fa-trophy feature-icon"></i>
+                    <span>Track your progress and rankings</span>
+                </div>
+                <div class="feature">
+                    <i class="fa-solid fa-user-group feature-icon"></i>
+                    <span>Challenge coders worldwide</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Login Form -->
+        <div class="right-panel">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1 class="form-title">Welcome back</h1>
+                    <p class="form-subtitle">Sign in to continue to CodeBattle</p>
+                </div>
+
+                <div class="login-form">
+                    <h2>Welcome to CodeBattle</h2>
+                    <form id="loginForm" action="{{ url_for('login') }}" method="POST" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required>
+                            <div class="password-input-container">
+                                <button type="button" class="password-toggle" id="passwordToggle">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="error-message" id="errorMessage">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span id="errorText"></span>
+                        </div>
+                        <button type="submit" class="login-btn">Login</button>
+                        <div class="form-footer">
+                            Don't have an account? <a href="#" id="switchToSignup">Create New Account</a>
+                        </div>
+                        <div class="form-note" style="margin-top: 15px; font-size: 0.8rem; color: #888; text-align: center;">
+                            <p>Multiple test users are available.</p>
+                            <p>Click "Show Available Users" to see credentials.</p>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="login-form" id="signupForm" style="display: none;">
+                    <h2>Create New Account</h2>
+                    <form id="signupFormInner" action="{{ url_for('signup') }}" method="POST" onsubmit="handleSignup(event)">
+                        <div class="form-group">
+                            <label for="signupUsername">Username</label>
+                            <input type="text" id="signupUsername" name="username" placeholder="Choose a username" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="signupEmail">Email</label>
+                            <input type="email" id="signupEmail" name="email" placeholder="Enter your email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" id="signupPassword" name="password" placeholder="Create a password" required>
+                            <div class="password-input-container">
+                                <button type="button" class="password-toggle" id="signupPasswordToggle">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                        </div>
+
+                        <div class="error-message" id="signupErrorMessage">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span id="signupErrorText"></span>
+                        </div>
+
+                        <button type="submit" class="login-btn">Create Account</button>
+
+                        <div class="form-footer">
+                            Already have an account? <a href="#" id="switchToLogin">Sign in</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auth module for handling authentication
+        const Auth = {
+            // Store user data in localStorage
+            users: JSON.parse(localStorage.getItem('users') || '[]'),
+
+            // Check if a user exists
+            userExists: function(username) {
+                return this.users.some(user => user.username === username);
+            },
+
+            // Create a new user
+            createUser: function(username, email, password) {
+                if (this.userExists(username)) {
+                    return false;
+                }
+
+                // Generate a random avatar color
+                const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+                // Generate user initials
+                const initials = username.substring(0, 2).toUpperCase();
+
+                const newUser = {
+                    // Basic account info
+                    username: username,
+                    email: email,
+                    password: password, // In a real app, this would be hashed
+
+                    // Game statistics
+                    rating: 1000,
+                    wins: 0,
+                    losses: 0,
+                    draws: 0,
+                    total_battles: 0,
+
+                    // Profile information
+                    display_name: username.charAt(0).toUpperCase() + username.slice(1),
+                    bio: "CodeBattle enthusiast",
+                    country: "United States",
+                    languages: ["JavaScript", "Python", "Java"],
+                    preferred_language: "Python",
+                    experience_level: "Intermediate",
+
+                    // Social information
+                    github_username: "",
+                    linkedin_profile: "",
+                    twitter_handle: "",
+
+                    // Appearance
+                    avatar_color: randomColor,
+                    initials: initials,
+                    theme_preference: "dark",
+
+                    // Achievements
+                    badges: [],
+                    achievements: [],
+
+                    // Settings
+                    email_notifications: true,
+                    public_profile: true,
+
+                    // System data
+                    created_at: new Date().toISOString(),
+                    last_login: new Date().toISOString(),
+                    account_status: "active"
+                };
+
+                this.users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(this.users));
+
+                // Don't set as current user during initialization
+                // Only set current user when explicitly logging in
+                if (arguments.length > 3 && arguments[3] === true) {
+                    localStorage.setItem('currentUser', JSON.stringify(newUser));
+                }
+
+                return true;
+            },
+
+            // Login a user
+            login: function(username, password) {
+                // Find user index
+                const userIndex = this.users.findIndex(user =>
+                    user.username === username && user.password === password
+                );
+
+                if (userIndex >= 0) {
+                    // Update last login time
+                    this.users[userIndex].last_login = new Date().toISOString();
+
+                    // Save updated user list
+                    localStorage.setItem('users', JSON.stringify(this.users));
+
+                    // Set as current user
+                    localStorage.setItem('currentUser', JSON.stringify(this.users[userIndex]));
+                    return true;
+                }
+
+                return false;
+            },
+
+            // Get current user
+            getCurrentUser: function() {
+                return JSON.parse(localStorage.getItem('currentUser') || 'null');
+            },
+
+            // Logout
+            logout: function() {
+                localStorage.removeItem('currentUser');
+            },
+
+            // Get all users
+            getAllUsers: function() {
+                return this.users;
+            },
+
+            // Update user data
+            updateUser: function(username, userData) {
+                const userIndex = this.users.findIndex(user => user.username === username);
+
+                if (userIndex >= 0) {
+                    // Update user data
+                    this.users[userIndex] = { ...this.users[userIndex], ...userData };
+
+                    // Save updated user list
+                    localStorage.setItem('users', JSON.stringify(this.users));
+
+                    // Update current user if it's the same user
+                    const currentUser = this.getCurrentUser();
+                    if (currentUser && currentUser.username === username) {
+                        localStorage.setItem('currentUser', JSON.stringify(this.users[userIndex]));
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+        };
+
+        // Toggle between login and signup forms
+        document.getElementById('switchToSignup').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loginForm').parentElement.style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+            document.querySelector('.form-title').textContent = 'Create an account';
+            document.querySelector('.form-subtitle').textContent = 'Join CodeBattle and start competing';
+        });
+
+        document.getElementById('switchToLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginForm').parentElement.style.display = 'block';
+            document.querySelector('.form-title').textContent = 'Welcome back';
+            document.querySelector('.form-subtitle').textContent = 'Sign in to continue to CodeBattle';
+        });
+
+        // Password visibility toggle
+        document.getElementById('passwordToggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        document.getElementById('signupPasswordToggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('signupPassword');
+            const icon = this.querySelector('i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Form submission
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Check if any users exist
+            if (Auth.users.length === 0) {
+                const errorMessage = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                errorText.textContent = 'No accounts exist. Please create an account first.';
+                errorMessage.style.display = 'flex';
+                return;
+            }
+
+            if (Auth.login(username, password)) {
+                // Submit the form to the server
+                document.getElementById('loginForm').submit();
+            } else {
+                const errorMessage = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                errorText.textContent = 'Invalid username or password';
+                errorMessage.style.display = 'flex';
+            }
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            const errorMessage = document.getElementById('signupErrorMessage');
+            const errorText = document.getElementById('signupErrorText');
+
+            // Basic validation
+            if (!username || !email || !password || !confirmPassword) {
+                errorText.textContent = 'Please fill in all fields';
+                errorMessage.style.display = 'flex';
+                return;
+            }
+
+            // Password match validation
+            if (password !== confirmPassword) {
+                errorText.textContent = 'Passwords do not match';
+                errorMessage.style.display = 'flex';
+                return;
+            }
+
+            // Username validation
+            if (username.length < 3) {
+                errorText.textContent = 'Username must be at least 3 characters';
+                errorMessage.style.display = 'flex';
+                return;
+            }
+
+            // Check if username already exists
+            if (Auth.userExists(username)) {
+                errorText.textContent = 'Username already exists';
+                errorMessage.style.display = 'flex';
+                return;
+            }
+
+            // Create user
+            if (Auth.createUser(username, email, password)) {
+                // Submit the form to the server
+                document.getElementById('signupFormInner').submit();
+            } else {
+                errorText.textContent = 'Error creating account';
+                errorMessage.style.display = 'flex';
+            }
+        }
+
+        // Initialize - add multiple users if none exist
+        if (Auth.users.length === 0) {
+            // Create users with custom profiles
+
+            // Demo user - general testing account
+            const demoUser = Auth.createUser('demo', 'demo@example.com', 'password');
+            Auth.updateUser('demo', {
+                display_name: 'Demo User',
+                bio: 'This is a demo account for testing purposes',
+                country: 'United States',
+                languages: ['JavaScript', 'Python', 'Java', 'C++'],
+                preferred_language: 'JavaScript',
+                experience_level: 'Intermediate',
+                github_username: 'demo-user',
+                rating: 1000,
+                wins: 5,
+                losses: 3,
+                badges: ['Newcomer', 'Quick Learner'],
+                avatar_color: '#3498db'
+            });
+
+            // Alice - frontend developer
+            const aliceUser = Auth.createUser('alice', 'alice@example.com', 'alice123');
+            Auth.updateUser('alice', {
+                display_name: 'Alice Chen',
+                bio: 'Frontend developer specializing in React and modern JavaScript',
+                country: 'Canada',
+                languages: ['JavaScript', 'TypeScript', 'HTML/CSS', 'React'],
+                preferred_language: 'JavaScript',
+                experience_level: 'Advanced',
+                github_username: 'alicechen',
+                linkedin_profile: 'alice-chen-dev',
+                twitter_handle: '@alicecodes',
+                rating: 1450,
+                wins: 24,
+                losses: 8,
+                total_battles: 32,
+                badges: ['Frontend Master', 'Algorithm Expert', 'Top Contributor'],
+                achievements: ['Solved 100+ challenges', 'Won 5 battles in a row'],
+                avatar_color: '#e74c3c'
+            });
+
+            // Bob - backend developer
+            const bobUser = Auth.createUser('bob', 'bob@example.com', 'bob123');
+            Auth.updateUser('bob', {
+                display_name: 'Bob Smith',
+                bio: 'Backend developer working with Node.js and databases',
+                country: 'United Kingdom',
+                languages: ['JavaScript', 'Node.js', 'Python', 'SQL'],
+                preferred_language: 'Node.js',
+                experience_level: 'Expert',
+                github_username: 'bobsmith-dev',
+                linkedin_profile: 'bob-smith-backend',
+                rating: 1380,
+                wins: 18,
+                losses: 12,
+                total_battles: 30,
+                badges: ['Database Wizard', 'Backend Specialist'],
+                achievements: ['Created 5 custom challenges'],
+                avatar_color: '#2ecc71'
+            });
+
+            // Charlie - data scientist
+            const charlieUser = Auth.createUser('charlie', 'charlie@example.com', 'charlie123');
+            Auth.updateUser('charlie', {
+                display_name: 'Charlie Wong',
+                bio: 'Data scientist with a passion for machine learning and AI',
+                country: 'Singapore',
+                languages: ['Python', 'R', 'SQL', 'TensorFlow'],
+                preferred_language: 'Python',
+                experience_level: 'Expert',
+                github_username: 'charlie-data',
+                linkedin_profile: 'charlie-wong-data',
+                rating: 1520,
+                wins: 32,
+                losses: 7,
+                total_battles: 39,
+                badges: ['Data Master', 'AI Specialist', 'Top Rated'],
+                achievements: ['Highest accuracy in ML challenges'],
+                avatar_color: '#9b59b6'
+            });
+
+            // Diana - mobile developer
+            const dianaUser = Auth.createUser('diana', 'diana@example.com', 'diana123');
+            Auth.updateUser('diana', {
+                display_name: 'Diana Rodriguez',
+                bio: 'Mobile app developer specializing in cross-platform solutions',
+                country: 'Mexico',
+                languages: ['JavaScript', 'React Native', 'Swift', 'Kotlin'],
+                preferred_language: 'React Native',
+                experience_level: 'Intermediate',
+                github_username: 'diana-mobile',
+                twitter_handle: '@diana_codes',
+                rating: 1150,
+                wins: 10,
+                losses: 15,
+                total_battles: 25,
+                badges: ['Mobile Expert', 'UI Designer'],
+                achievements: ['Best mobile UI solution'],
+                avatar_color: '#f39c12'
+            });
+
+            // Eric - game developer
+            const ericUser = Auth.createUser('eric', 'eric@example.com', 'eric123');
+            Auth.updateUser('eric', {
+                display_name: 'Eric Johnson',
+                bio: 'Game developer with experience in Unity and Unreal Engine',
+                country: 'Australia',
+                languages: ['C#', 'C++', 'JavaScript', 'Python'],
+                preferred_language: 'C#',
+                experience_level: 'Advanced',
+                github_username: 'eric-games',
+                linkedin_profile: 'eric-johnson-games',
+                rating: 1280,
+                wins: 15,
+                losses: 10,
+                total_battles: 25,
+                badges: ['Game Logic Master', 'Performance Optimizer'],
+                achievements: ['Created a custom game challenge'],
+                avatar_color: '#1abc9c'
+            });
+
+            // Clear current user to ensure login is required
+            localStorage.removeItem('currentUser');
+
+            console.log('Added multiple users with unique profiles to the system');
+        }
+
+        // Function to display available users (for testing purposes)
+        function displayAvailableUsers() {
+            const users = Auth.getAllUsers();
+
+            // Create a modal for displaying user profiles
+            const modal = document.createElement('div');
+            modal.className = 'user-profiles-modal';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            modal.style.zIndex = '1000';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+
+            // Create modal content
+            const modalContent = document.createElement('div');
+            modalContent.className = 'user-profiles-content';
+            modalContent.style.backgroundColor = '#1e1e1e';
+            modalContent.style.borderRadius = '8px';
+            modalContent.style.maxWidth = '800px';
+            modalContent.style.width = '90%';
+            modalContent.style.maxHeight = '80vh';
+            modalContent.style.overflowY = 'auto';
+            modalContent.style.padding = '20px';
+            modalContent.style.color = '#e0e0e0';
+
+            // Create close button
+            const closeButton = document.createElement('button');
+            closeButton.textContent = '×';
+            closeButton.style.position = 'absolute';
+            closeButton.style.top = '10px';
+            closeButton.style.right = '15px';
+            closeButton.style.fontSize = '24px';
+            closeButton.style.background = 'none';
+            closeButton.style.border = 'none';
+            closeButton.style.color = '#e0e0e0';
+            closeButton.style.cursor = 'pointer';
+            closeButton.onclick = function() {
+                document.body.removeChild(modal);
+            };
+
+            // Create header
+            const header = document.createElement('h2');
+            header.textContent = 'Available User Profiles';
+            header.style.textAlign = 'center';
+            header.style.marginBottom = '20px';
+
+            // Create user cards container
+            const userCardsContainer = document.createElement('div');
+            userCardsContainer.style.display = 'grid';
+            userCardsContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+            userCardsContainer.style.gap = '20px';
+
+            // Add user cards
+            users.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                userCard.style.backgroundColor = '#2a2a2a';
+                userCard.style.borderRadius = '8px';
+                userCard.style.padding = '15px';
+                userCard.style.border = `2px solid ${user.avatar_color || '#555'}`;
+
+                // User header with avatar
+                const userHeader = document.createElement('div');
+                userHeader.style.display = 'flex';
+                userHeader.style.alignItems = 'center';
+                userHeader.style.marginBottom = '15px';
+
+                const userAvatar = document.createElement('div');
+                userAvatar.style.width = '50px';
+                userAvatar.style.height = '50px';
+                userAvatar.style.borderRadius = '50%';
+                userAvatar.style.backgroundColor = user.avatar_color || '#555';
+                userAvatar.style.color = '#fff';
+                userAvatar.style.display = 'flex';
+                userAvatar.style.justifyContent = 'center';
+                userAvatar.style.alignItems = 'center';
+                userAvatar.style.fontWeight = 'bold';
+                userAvatar.style.fontSize = '18px';
+                userAvatar.textContent = user.initials || user.username.substring(0, 2).toUpperCase();
+
+                const userInfo = document.createElement('div');
+                userInfo.style.marginLeft = '15px';
+
+                const displayName = document.createElement('div');
+                displayName.style.fontWeight = 'bold';
+                displayName.style.fontSize = '18px';
+                displayName.textContent = user.display_name || user.username;
+
+                const username = document.createElement('div');
+                username.style.color = '#aaa';
+                username.style.fontSize = '14px';
+                username.textContent = '@' + user.username;
+
+                userInfo.appendChild(displayName);
+                userInfo.appendChild(username);
+
+                userHeader.appendChild(userAvatar);
+                userHeader.appendChild(userInfo);
+
+                // User credentials (for testing)
+                const credentials = document.createElement('div');
+                credentials.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                credentials.style.padding = '10px';
+                credentials.style.borderRadius = '4px';
+                credentials.style.marginBottom = '15px';
+                credentials.style.fontSize = '14px';
+
+                const credTitle = document.createElement('div');
+                credTitle.style.fontWeight = 'bold';
+                credTitle.style.marginBottom = '5px';
+                credTitle.textContent = 'Login Credentials:';
+
+                const credUsername = document.createElement('div');
+                credUsername.textContent = `Username: ${user.username}`;
+
+                const credPassword = document.createElement('div');
+                credPassword.textContent = `Password: ${user.password}`;
+
+                credentials.appendChild(credTitle);
+                credentials.appendChild(credUsername);
+                credentials.appendChild(credPassword);
+
+                // User bio
+                const bio = document.createElement('div');
+                bio.style.marginBottom = '15px';
+                bio.style.fontSize = '14px';
+                bio.textContent = user.bio || 'No bio available';
+
+                // User stats
+                const stats = document.createElement('div');
+                stats.style.display = 'grid';
+                stats.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                stats.style.gap = '10px';
+                stats.style.marginBottom = '15px';
+
+                const createStat = (label, value) => {
+                    const stat = document.createElement('div');
+                    stat.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    stat.style.padding = '8px';
+                    stat.style.borderRadius = '4px';
+                    stat.style.textAlign = 'center';
+
+                    const statValue = document.createElement('div');
+                    statValue.style.fontWeight = 'bold';
+                    statValue.style.fontSize = '16px';
+                    statValue.textContent = value;
+
+                    const statLabel = document.createElement('div');
+                    statLabel.style.fontSize = '12px';
+                    statLabel.style.color = '#aaa';
+                    statLabel.textContent = label;
+
+                    stat.appendChild(statValue);
+                    stat.appendChild(statLabel);
+
+                    return stat;
+                };
+
+                stats.appendChild(createStat('Rating', user.rating || 1000));
+                stats.appendChild(createStat('Battles', user.total_battles || 0));
+                stats.appendChild(createStat('Wins', user.wins || 0));
+                stats.appendChild(createStat('Losses', user.losses || 0));
+
+                // User details
+                const details = document.createElement('div');
+                details.style.fontSize = '14px';
+                details.style.marginBottom = '15px';
+
+                const createDetail = (label, value) => {
+                    if (!value) return null;
+
+                    const detail = document.createElement('div');
+                    detail.style.marginBottom = '5px';
+                    detail.style.display = 'flex';
+
+                    const detailLabel = document.createElement('div');
+                    detailLabel.style.fontWeight = 'bold';
+                    detailLabel.style.width = '120px';
+                    detailLabel.style.color = '#aaa';
+                    detailLabel.textContent = label + ':';
+
+                    const detailValue = document.createElement('div');
+                    detailValue.style.flex = '1';
+                    detailValue.textContent = value;
+
+                    detail.appendChild(detailLabel);
+                    detail.appendChild(detailValue);
+
+                    return detail;
+                };
+
+                const countryDetail = createDetail('Country', user.country);
+                if (countryDetail) details.appendChild(countryDetail);
+
+                const expDetail = createDetail('Experience', user.experience_level);
+                if (expDetail) details.appendChild(expDetail);
+
+                const prefLangDetail = createDetail('Preferred Lang', user.preferred_language);
+                if (prefLangDetail) details.appendChild(prefLangDetail);
+
+                // Languages
+                if (user.languages && user.languages.length > 0) {
+                    const languages = document.createElement('div');
+                    languages.style.marginBottom = '15px';
+
+                    const langTitle = document.createElement('div');
+                    langTitle.style.fontWeight = 'bold';
+                    langTitle.style.fontSize = '14px';
+                    langTitle.style.marginBottom = '5px';
+                    langTitle.style.color = '#aaa';
+                    langTitle.textContent = 'Languages:';
+
+                    const langTags = document.createElement('div');
+                    langTags.style.display = 'flex';
+                    langTags.style.flexWrap = 'wrap';
+                    langTags.style.gap = '5px';
+
+                    user.languages.forEach(lang => {
+                        const tag = document.createElement('span');
+                        tag.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                        tag.style.padding = '3px 8px';
+                        tag.style.borderRadius = '4px';
+                        tag.style.fontSize = '12px';
+                        tag.textContent = lang;
+                        langTags.appendChild(tag);
+                    });
+
+                    languages.appendChild(langTitle);
+                    languages.appendChild(langTags);
+                    details.appendChild(languages);
+                }
+
+                // Badges
+                if (user.badges && user.badges.length > 0) {
+                    const badges = document.createElement('div');
+                    badges.style.marginBottom = '15px';
+
+                    const badgesTitle = document.createElement('div');
+                    badgesTitle.style.fontWeight = 'bold';
+                    badgesTitle.style.fontSize = '14px';
+                    badgesTitle.style.marginBottom = '5px';
+                    badgesTitle.style.color = '#aaa';
+                    badgesTitle.textContent = 'Badges:';
+
+                    const badgesList = document.createElement('div');
+                    badgesList.style.display = 'flex';
+                    badgesList.style.flexWrap = 'wrap';
+                    badgesList.style.gap = '5px';
+
+                    user.badges.forEach(badge => {
+                        const badgeItem = document.createElement('span');
+                        badgeItem.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                        badgeItem.style.padding = '3px 8px';
+                        badgeItem.style.borderRadius = '4px';
+                        badgeItem.style.fontSize = '12px';
+                        badgeItem.style.color = '#ffcc00';
+                        badgeItem.innerHTML = `<i class="fas fa-award"></i> ${badge}`;
+                        badgesList.appendChild(badgeItem);
+                    });
+
+                    badges.appendChild(badgesTitle);
+                    badges.appendChild(badgesList);
+                    details.appendChild(badges);
+                }
+
+                // Login button
+                const loginButton = document.createElement('button');
+                loginButton.textContent = 'Login as ' + user.username;
+                loginButton.style.backgroundColor = user.avatar_color || '#3498db';
+                loginButton.style.color = '#fff';
+                loginButton.style.border = 'none';
+                loginButton.style.borderRadius = '4px';
+                loginButton.style.padding = '8px 12px';
+                loginButton.style.width = '100%';
+                loginButton.style.cursor = 'pointer';
+                loginButton.style.marginTop = '10px';
+                loginButton.onclick = function() {
+                    document.getElementById('username').value = user.username;
+                    document.getElementById('password').value = user.password;
+                    document.body.removeChild(modal);
+                };
+
+                // Assemble card
+                userCard.appendChild(userHeader);
+                userCard.appendChild(credentials);
+                userCard.appendChild(bio);
+                userCard.appendChild(stats);
+                userCard.appendChild(details);
+                userCard.appendChild(loginButton);
+
+                userCardsContainer.appendChild(userCard);
+            });
+
+            // Assemble modal
+            modalContent.appendChild(closeButton);
+            modalContent.appendChild(header);
+            modalContent.appendChild(userCardsContainer);
+            modal.appendChild(modalContent);
+
+            // Add to body
+            document.body.appendChild(modal);
+
+            // Also log to console for debugging
+            console.log('Available users:', users);
+        }
+
+        // Add a small button to show available users
+        const loginForm = document.getElementById('loginForm').parentElement;
+        const showUsersButton = document.createElement('button');
+        showUsersButton.type = 'button';
+        showUsersButton.className = 'show-users-btn';
+        showUsersButton.textContent = 'Show Available Users';
+        showUsersButton.style.marginTop = '10px';
+        showUsersButton.style.padding = '5px 10px';
+        showUsersButton.style.fontSize = '0.8rem';
+        showUsersButton.style.backgroundColor = '#555';
+        showUsersButton.style.color = '#fff';
+        showUsersButton.style.border = 'none';
+        showUsersButton.style.borderRadius = '4px';
+        showUsersButton.style.cursor = 'pointer';
+        showUsersButton.onclick = displayAvailableUsers;
+
+        loginForm.appendChild(showUsersButton);
+    </script>
+</body>
+</html>
